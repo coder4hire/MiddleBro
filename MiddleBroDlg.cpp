@@ -171,7 +171,7 @@ void CMiddleBroDlg::OnDummyExit()
 
 void CMiddleBroDlg::OnDummyShow()
 {
-	this->ShowWindow(WM_SHOWWINDOW);
+	RestoreFromTray();
 }
 
 void CMiddleBroDlg::OnTimeExpired()

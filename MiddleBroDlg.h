@@ -42,7 +42,7 @@ protected:
 	CStatic lblTimeElapsed;
 	CTime startTime;
 	
-	int timeLimit = 2100;
+	int timeLimit = 305;
 	int timeFirstSignal = 300;
 
 	afx_msg void OnDummyExit();
