@@ -4,12 +4,16 @@
 //
 #define IDD_MIDDLEBRO_DIALOG            102
 #define IDD_StatisticsDlg               103
-#define IDD_BlockingDlg              104
+#define IDD_BlockingDlg                 104
+#define IDD_PwdDlg                      105
 #define IDR_MAINFRAME                   128
 #define IDI_TRAY_ICON                   131
 #define IDR_TRAY_MENU                   132
+#define IDR_WAVE_1RING                  137
+#define IDR_WAVE_END                    138
 #define IDC_EDIT1                       1000
 #define IDC_OUT                         1000
+#define IDC_EDIT_PWD                    1000
 #define IDC_OUT2                        1001
 #define IDC_OUT_DURATIONS               1001
 #define IDC_STAT_TREE                   1001
@@ -24,9 +28,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        134
+#define _APS_NEXT_RESOURCE_VALUE        140
 #define _APS_NEXT_COMMAND_VALUE         32774
 #define _APS_NEXT_CONTROL_VALUE         1006
-#define _APS_NEXT_SYMED_VALUE           105
+#define _APS_NEXT_SYMED_VALUE           106
 #endif
 #endif

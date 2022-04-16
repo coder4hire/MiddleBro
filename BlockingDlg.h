@@ -24,4 +24,8 @@ public:
 	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	static void Show();
+	
+	static BlockingDlg dlg;
 };

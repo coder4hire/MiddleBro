@@ -6,6 +6,7 @@
 #include "BlockingDlg.h"
 #include "afxdialogex.h"
 
+BlockingDlg BlockingDlg::dlg;
 
 // BlockingDlg dialog
 
@@ -52,11 +53,11 @@ BOOL BlockingDlg::OnInitDialog()
 
 	this->SetWindowPos(&wndTopMost, (screenRect.right - screenRect.left) / 10,
 		(screenRect.bottom - screenRect.top) / 10,
-		(screenRect.right + screenRect.left) * 4 / 15,
-		(screenRect.bottom + screenRect.top) * 4 / 15,
+		(screenRect.right + screenRect.left) * 4 / 5,
+		(screenRect.bottom + screenRect.top) * 4 / 5,
 		WS_EX_TOPMOST);
 
-	SetTimer(0, 1000, NULL);
+	SetTimer(0, 10000, NULL);
 
 	auto wnd = FindWindow(_T("Shell_TrayWnd"), NULL);
 	wnd->SendMessage(WM_COMMAND, 419, 0); // MIN_ALL
@@ -75,4 +76,16 @@ void BlockingDlg::OnTimer(UINT_PTR nIDEvent)
 	wnd->SendMessage(WM_COMMAND, 419, 0); // MIN_ALL
 
 	CDialog::OnTimer(nIDEvent);
+}
+
+void BlockingDlg::Show()
+{
+	if (!dlg)
+	{
+		dlg.Create(IDD_BlockingDlg);
+	}
+	else
+	{
+		dlg.ShowWindow(WM_SHOWWINDOW);
+	}
 }

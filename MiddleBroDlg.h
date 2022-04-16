@@ -41,9 +41,12 @@ protected:
 	CStatic lblTimeLeft;
 	CStatic lblTimeElapsed;
 	CTime startTime;
-	int timeLimit = 1800;
-	BlockingDlg blockingDlg;
+	
+	int timeLimit = 2100;
+	int timeFirstSignal = 300;
 
 	afx_msg void OnDummyExit();
 	afx_msg void OnDummyShow();
+
+	void OnTimeExpired();
 };

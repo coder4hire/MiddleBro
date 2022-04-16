@@ -45,6 +45,9 @@
     <ClInclude Include="BlockingDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PwdDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MiddleBro.cpp">
@@ -68,6 +71,9 @@
     <ClCompile Include="BlockingDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PwdDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiddleBro.rc">
@@ -78,6 +84,9 @@
     <None Include="res\MiddleBro.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\sound1.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\MiddleBro.ico">
@@ -86,5 +95,13 @@
     <Image Include="res\trayicon.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\10min.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\end.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
 </Project>

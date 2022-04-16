@@ -9,6 +9,8 @@
 #include "afxdialogex.h"
 
 #include "StatisticsDlg.h"
+#include "PwdDlg.h"
+#include <Mmsystem.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -75,7 +77,7 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	lblTimeLeft.SetFont(&font);
 
 	startTime = CTime::GetCurrentTime();
-	SetTimer(0, 1000, NULL);
+	SetTimer(0, 800, NULL);
 
 	ShowTrayIcon();
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -125,6 +127,26 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 
 	lblTimeLeft.SetWindowText(tmLeft.Format("%H:%M:%S"));
 	lblTimeElapsed.SetWindowText(tmElapsed.Format("%H:%M:%S"));
+
+	if (tmLeft == timeFirstSignal)
+	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
+			GetModuleHandle(NULL), 
+			SND_RESOURCE | SND_ASYNC);
+
+		ShowBaloon(_T("Middle Bro"), _T("Session will be blocked soon.\r\nTime left: " + tmLeft.Format("%H:%M:%S")));
+	}
+
+	if (tmLeft <= 0)
+	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_END),
+			GetModuleHandle(NULL),
+			SND_RESOURCE | SND_ASYNC);
+		ShowBaloon(_T("Middle Bro"), _T("Session time is over."));
+		OnTimeExpired();
+		KillTimer(0);
+	}
+
 	CDialogTray::OnTimer(nIDEvent);
 }
 
@@ -138,12 +160,21 @@ void CMiddleBroDlg::OnBnClickedButtonStat()
 
 void CMiddleBroDlg::OnDummyExit()
 {
-	RemoveTrayIcon();
-	CDialogEx::OnCancel();
+	//TODO: change to real password from settings
+	if (PwdDlg::ShowCheckPwd(_T("exit")))
+	{
+		RemoveTrayIcon();
+		CDialogEx::OnCancel();
+	}
 }
 
 
 void CMiddleBroDlg::OnDummyShow()
 {
-	blockingDlg.Create(IDD_BlockingDlg);
+	this->ShowWindow(WM_SHOWWINDOW);
+}
+
+void CMiddleBroDlg::OnTimeExpired()
+{
+	BlockingDlg::Show();
 }
