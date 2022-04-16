@@ -12,21 +12,28 @@ public:
 	std::vector<std::pair<Timestamp, Timestamp>> WorkPeriods;
 	bool IsOpen = false;
 
-	std::chrono::milliseconds GetTotalDuration(Timestamp start,Timestamp end)
+	std::chrono::milliseconds GetTotalDuration(Timestamp start,Timestamp end) const
 	{
 		std::chrono::milliseconds total(0);
 		for (const auto& item : WorkPeriods)
 		{
-			if (item.first >= start && item.second <= end)
-				total += item.second - item.first;
-			else if (item.first < start && item.second > end)
+			auto second = item.second == Timestamp(std::chrono::milliseconds(0)) ? end : item.second;
+			if (item.first >= start && second <= end)
+				total += second - item.first;
+			else if (item.first < start && second > end)
 				total += end-start;
-			else if (item.first < start && item.second > start)
-				total += item.second - start;
-			else if (item.first < end && (item.second == Timestamp(std::chrono::milliseconds(0)) || item.second > end))
+			else if (item.first < start && second > start)
+				total += second - start;
+			else if (item.first < end && second > end)
 				total += end - item.first;
 		}
 		return total;
+	}
+
+	CString GetTotalDurationString(Timestamp start, Timestamp end) const
+	{
+		auto span = CTimeSpan(GetTotalDuration(start, end).count()/1000);
+		return span.Format("%H:%M:%S");
 	}
 };
 

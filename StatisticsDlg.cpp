@@ -61,7 +61,7 @@ void StatisticsDlg::RefreshData()
 	const auto& infoMap = Watcher::Inst.GetProgramsInfoMap();
 	for (const auto& info : infoMap)
 	{
-		auto progItem = treeStatistics.InsertItem(info.first.c_str());
+		auto progItem = treeStatistics.InsertItem(CString(info.first.c_str()) + " ("+ info.second.GetTotalDurationString(Timestamp(), std::chrono::time_point_cast<Timestamp::duration>(Timestamp::clock::now()))+")");
 		for (const auto& period : info.second.WorkPeriods)
 		{
 			std::time_t tt = std::chrono::system_clock::to_time_t(period.first);
