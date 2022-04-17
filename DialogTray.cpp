@@ -57,12 +57,29 @@ BOOL CDialogTray::ShowTrayIcon()
     nid.uID = ID_FLIPPED_TO_TRAY;
     nid.uCallbackMessage = MYWM_NOTIFYICON;
     nid.hIcon = hIcon;
+	nid.dwInfoFlags = NIIF_INFO;
 	_tcscpy_s(nid.szTip,_countof(nid.szTip),Tooltip);
     nid.uFlags = NIF_ICON|NIF_MESSAGE|NIF_TIP;
 
     // Showing icon
     return Shell_NotifyIcon(NIM_ADD, &nid);
 }
+
+//BOOL CDialogTray::SetTooltip(LPCTSTR tooltip)
+//{
+//	NOTIFYICONDATA nid;
+//	memset(&nid, 0, sizeof(nid));
+//	nid.cbSize = NOTIFYICONDATA_V2_SIZE;
+//	nid.uVersion = NOTIFYICON_VERSION;
+//	nid.uID = ID_FLIPPED_TO_TRAY;
+//	Shell_NotifyIcon(NIM_SETVERSION, &nid);
+//
+//	_tcscpy_s(nid.szTip, _countof(nid.szTip), tooltip);
+//	nid.uFlags = NIF_TIP;
+//
+//	// Showing icon
+//	return Shell_NotifyIcon(NIM_MODIFY, &nid);
+//}
 
 void CDialogTray::HideToTray()
 {
@@ -108,18 +125,20 @@ afx_msg LRESULT CDialogTray::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 {
 	if(wParam == ID_FLIPPED_TO_TRAY)
 	{
-		switch(lParam)
+		switch (lParam)
 		{
 		case WM_LBUTTONDBLCLK:
 			RestoreFromTray();
 			break;
 		case WM_RBUTTONDOWN:
+		{
 			CMenu menu;
 			menu.LoadMenu(IDR_TRAY_MENU);
 			POINT point;
 			GetCursorPos(&point);
-			menu.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN /*| TPM_RIGHTBUTTON | TPM_BOTTOMALIGN*/,point.x,point.y,this);
+			menu.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN /*| TPM_RIGHTBUTTON | TPM_BOTTOMALIGN*/, point.x, point.y, this);
 			break;
+		}
 		}
 	}
     

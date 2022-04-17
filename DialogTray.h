@@ -15,6 +15,7 @@ public:
     void HideToTray();
     void RestoreFromTray();
 	BOOL ShowTrayIcon();
+//	BOOL SetTooltip(LPCTSTR tooltip);
 	BOOL RemoveTrayIcon();
 
 	HICON hIcon;
@@ -31,3 +32,5 @@ protected:
 	virtual void OnOK();
 	virtual void OnCancel();
 };
+
+BOOL SetTooltip(LPCTSTR tooltip);

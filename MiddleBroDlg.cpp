@@ -30,8 +30,7 @@ CMiddleBroDlg::CMiddleBroDlg(CWnd* pParent /*=nullptr*/)
 void CMiddleBroDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogTray::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_STATIC_TIME_LEFT, lblTimeLeft);
-	DDX_Control(pDX, IDC_STATIC_TIME_ELAPSED, lblTimeElapsed);
+	DDX_Control(pDX, IDC_STATIC_TIME, ctrlClock);
 }
 
 BEGIN_MESSAGE_MAP(CMiddleBroDlg, CDialogTray)
@@ -56,29 +55,10 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-
-	CFont font;
-	font.CreateFont(
-		1,                        // nHeight
-		0,                         // nWidth
-		0,                         // nEscapement
-		0,                         // nOrientation
-		FW_NORMAL,                 // nWeight
-		TRUE,                     // bItalic
-		FALSE,                     // bUnderline
-		0,                         // cStrikeOut
-		ANSI_CHARSET,              // nCharSet
-		OUT_DEFAULT_PRECIS,        // nOutPrecision
-		CLIP_DEFAULT_PRECIS,       // nClipPrecision
-		DEFAULT_QUALITY,           // nQuality
-		DEFAULT_PITCH | FF_SWISS,  // nPitchAndFamily
-		_T("Arial"));                 // lpszFacename
-
-	lblTimeLeft.SetFont(&font);
-
 	startTime = CTime::GetCurrentTime();
 	SetTimer(0, 800, NULL);
 
+	Tooltip = "MiddleBro";
 	ShowTrayIcon();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -125,9 +105,8 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 	auto tmElapsed = (CTime::GetCurrentTime() - startTime);
 	auto tmLeft = CTimeSpan(timeLimit) - tmElapsed;
 
-	lblTimeLeft.SetWindowText(tmLeft.Format("%H:%M:%S"));
-	lblTimeElapsed.SetWindowText(tmElapsed.Format("%H:%M:%S"));
-
+	ctrlClock.SetOutputTime(tmLeft, tmElapsed);
+	
 	if (tmLeft == timeFirstSignal)
 	{
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
@@ -143,6 +122,7 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 			GetModuleHandle(NULL),
 			SND_RESOURCE | SND_ASYNC);
 		ShowBaloon(_T("Middle Bro"), _T("Session time is over."));
+		Sleep(3000);
 		OnTimeExpired();
 		KillTimer(0);
 	}

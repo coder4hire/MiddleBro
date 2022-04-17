@@ -19,6 +19,7 @@
 #define IDC_STAT_TREE                   1001
 #define IDC_BUTTON_STAT                 1002
 #define IDC_STATIC_TIME_LEFT            1004
+#define IDC_STATIC_TIME                 1004
 #define IDC_STATIC_TIME_ELAPSED         1005
 #define ID_DUMMY_SETTINGS               32771
 #define ID_DUMMY_EXIT                   32772

@@ -9,6 +9,7 @@
 #include "watcher.h"
 #include "DialogTray.h"
 #include "BlockingDlg.h"
+#include "ClockCtrl.h"
 
 // CMiddleBroDlg dialog
 class CMiddleBroDlg : public CDialogTray
@@ -38,8 +39,6 @@ protected:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButtonStat();
 	
-	CStatic lblTimeLeft;
-	CStatic lblTimeElapsed;
 	CTime startTime;
 	
 	int timeLimit = 305;
@@ -49,4 +48,6 @@ protected:
 	afx_msg void OnDummyShow();
 
 	void OnTimeExpired();
+public:
+	ClockCtrl ctrlClock;
 };

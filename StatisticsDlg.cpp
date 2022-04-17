@@ -53,10 +53,6 @@ BOOL StatisticsDlg::OnInitDialog()
 void StatisticsDlg::RefreshData()
 {
 	treeStatistics.DeleteAllItems();
-	//for (auto& txt : Watcher::Inst.GetWindowsNames())
-	//{
-	//	str += txt + _T("\r\n");
-	//}
 
 	const auto& infoMap = Watcher::Inst.GetProgramsInfoMap();
 	for (const auto& info : infoMap)

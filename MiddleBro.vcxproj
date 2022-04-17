@@ -187,6 +187,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BlockingDlg.h" />
+    <ClInclude Include="ClockCtrl.h" />
     <ClInclude Include="DialogTray.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MiddleBro.h" />
@@ -200,6 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BlockingDlg.cpp" />
+    <ClCompile Include="ClockCtrl.cpp" />
     <ClCompile Include="DialogTray.cpp" />
     <ClCompile Include="MiddleBro.cpp" />
     <ClCompile Include="MiddleBroDlg.cpp" />
