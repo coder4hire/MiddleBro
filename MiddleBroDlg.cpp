@@ -10,6 +10,7 @@
 
 #include "StatisticsDlg.h"
 #include "PwdDlg.h"
+#include "Settings.h"
 #include <Mmsystem.h>
 
 #ifdef _DEBUG
@@ -54,6 +55,8 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
+
+	Settings::Inst.Load(_T("settings.json"));
 
 	startTime = CTime::GetCurrentTime();
 	SetTimer(0, 800, NULL);
