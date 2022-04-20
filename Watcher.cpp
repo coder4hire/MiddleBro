@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "Watcher.h"
 #include "MiddleBroDlg.h"
+#include "Settings.h"
+#include <regex>
+#include <Mmsystem.h>
 
 Watcher Watcher::Inst;
 
@@ -16,6 +19,12 @@ Watcher::Watcher()
             {
                 Inst.RefreshWindowsNames();
                 Inst.RefreshProgramsInfo();
+                if (Inst.CheckBlackNames())
+                {
+                    PlaySound(MAKEINTRESOURCE(IDR_WAVE_WARNING),
+                        GetModuleHandle(NULL),
+                        SND_RESOURCE | SND_ASYNC);
+                }
             }
             catch (...)
             {
@@ -52,7 +61,6 @@ void Watcher::RefreshWindowsNames()
         if (title == _T("Program Manager"))
             continue;
         windowsNames.push_back(title);
-
     }
 }
 
@@ -93,4 +101,19 @@ void Watcher::RefreshProgramsInfo()
             prog.second.WorkPeriods.back().second = now;
         }
     }
+}
+
+bool Watcher::CheckBlackNames()
+{
+   for(auto item : Settings::Inst.BlackNames)
+   { 
+       std::basic_regex<TCHAR> re((LPCTSTR)item);
+       if (std::any_of(windowsNames.begin(), windowsNames.end(), [&re](const tstring& winName) {
+           return std::regex_match(winName, re); }
+       ))
+       {
+           return true;
+       }
+   }
+   return false;
 }

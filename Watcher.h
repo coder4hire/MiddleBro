@@ -52,6 +52,7 @@ protected:
 	static std::map<UINT_PTR, Watcher*> timerToWatcherMap;
 	void RefreshWindowsNames();
 	void RefreshProgramsInfo();
+	bool CheckBlackNames();
 	UINT_PTR timerID = 0;
 };
 

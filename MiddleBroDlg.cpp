@@ -11,6 +11,7 @@
 #include "StatisticsDlg.h"
 #include "PwdDlg.h"
 #include "Settings.h"
+#include "SettingsDlg.h"
 #include <Mmsystem.h>
 
 #ifdef _DEBUG
@@ -42,6 +43,7 @@ BEGIN_MESSAGE_MAP(CMiddleBroDlg, CDialogTray)
 	ON_BN_CLICKED(IDC_BUTTON_STAT, &CMiddleBroDlg::OnBnClickedButtonStat)
 	ON_COMMAND(ID_DUMMY_EXIT, &CMiddleBroDlg::OnDummyExit)
 	ON_COMMAND(ID_DUMMY_SHOW, &CMiddleBroDlg::OnDummyShow)
+	ON_COMMAND(ID_Menu, &CMiddleBroDlg::OnMenu)
 END_MESSAGE_MAP()
 
 
@@ -56,7 +58,11 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	Settings::Inst.Load(_T("settings.json"));
+	Settings::Inst.ProcessProperties(NULL, false);
+	if (!Settings::Inst.LoadDataFromFiles(Settings::Inst.ConfigFilesLocation + _T("\\settings.json")))
+	{
+		AfxMessageBox(_T("Cannot load config files from:\r\n")+ Settings::Inst.ConfigFilesLocation + _T("\\settings.json"), MB_OK | MB_ICONEXCLAMATION);
+	}
 
 	startTime = CTime::GetCurrentTime();
 	SetTimer(0, 800, NULL);
@@ -110,7 +116,7 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 
 	ctrlClock.SetOutputTime(tmLeft, tmElapsed);
 	
-	if (tmLeft == timeFirstSignal)
+	if (tmLeft == Settings::Inst.SecondsBeforeFirstSignal)
 	{
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
 			GetModuleHandle(NULL), 
@@ -160,4 +166,11 @@ void CMiddleBroDlg::OnDummyShow()
 void CMiddleBroDlg::OnTimeExpired()
 {
 	BlockingDlg::Show();
+}
+
+
+void CMiddleBroDlg::OnMenu()
+{
+	SettingsDlg dlg(this);
+	dlg.DoModal();
 }

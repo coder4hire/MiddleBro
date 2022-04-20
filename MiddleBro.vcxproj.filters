@@ -54,6 +54,9 @@
     <ClInclude Include="Settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SettingsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MiddleBro.cpp">
@@ -86,6 +89,9 @@
     <ClCompile Include="Settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SettingsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MiddleBro.rc">
@@ -113,6 +119,9 @@
       <Filter>Resource Files</Filter>
     </Media>
     <Media Include="res\end.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\warning.wav">
       <Filter>Resource Files</Filter>
     </Media>
   </ItemGroup>

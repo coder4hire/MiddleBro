@@ -41,8 +41,7 @@ protected:
 	
 	CTime startTime;
 	
-	int timeLimit = 305;
-	int timeFirstSignal = 300;
+	int timeLimit = 2100;
 
 	afx_msg void OnDummyExit();
 	afx_msg void OnDummyShow();
@@ -50,4 +49,5 @@ protected:
 	void OnTimeExpired();
 public:
 	ClockCtrl ctrlClock;
+	afx_msg void OnMenu();
 };

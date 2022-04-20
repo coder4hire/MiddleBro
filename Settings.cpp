@@ -11,51 +11,52 @@
 
 Settings Settings::Inst;
 
-bool Settings::Load(LPCTSTR fileName)
+bool Settings::LoadDataFromFiles(LPCTSTR fileName)
 {
-    FILE* fp = NULL;
-    if (!_tfopen_s(&fp, fileName, _T("rb")))
-    {
+	FILE* fp = NULL;
+	if (!_tfopen_s(&fp, fileName, _T("rb")))
+	{
 
-        char readBuffer[8192];
-        rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+		char readBuffer[8192];
+		rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
 
-        rapidjson::GenericDocument<
+		rapidjson::GenericDocument<
 #ifdef _UNICODE        
-            rapidjson::UTF8<wchar_t>
+			rapidjson::UTF8<wchar_t>
 #else
-            rapidjson::UTF8<>
+			rapidjson::UTF8<>
 #endif
-        > d;
+		> d;
 
-        d.ParseStream(is);
-        fclose(fp);
+		d.ParseStream(is);
+		fclose(fp);
 
 
-        if (d.HasMember(LIMITED_NAMES) && d[LIMITED_NAMES].IsArray())
-        {
-            for (const auto& x : d[LIMITED_NAMES].GetArray())
-            {
-                LimitedNames.push_back(x.GetString());
-            }
-        }
+		if (d.HasMember(LIMITED_NAMES) && d[LIMITED_NAMES].IsArray())
+		{
+			for (const auto& x : d[LIMITED_NAMES].GetArray())
+			{
+				LimitedNames.push_back(x.GetString());
+			}
+		}
 
-        if (d.HasMember(WHITE_NAMES) && d[WHITE_NAMES].IsArray())
-        {
-            for (const auto& x : d[WHITE_NAMES].GetArray())
-            {
-                WhiteNames.push_back(x.GetString());
-            }
-        }
+		if (d.HasMember(WHITE_NAMES) && d[WHITE_NAMES].IsArray())
+		{
+			for (const auto& x : d[WHITE_NAMES].GetArray())
+			{
+				WhiteNames.push_back(x.GetString());
+			}
+		}
 
-        if (d.HasMember(BLACK_NAMES) && d[BLACK_NAMES].IsArray())
-        {
-            for (const auto& x : d[BLACK_NAMES].GetArray())
-            {
-                BlackNames.push_back(x.GetString());
-            }
-        }
-    }
+		if (d.HasMember(BLACK_NAMES) && d[BLACK_NAMES].IsArray())
+		{
+			for (const auto& x : d[BLACK_NAMES].GetArray())
+			{
+				BlackNames.push_back(x.GetString());
+			}
+		}
+		return true;
+	}
 
-        return false;
+	return false;
 }
