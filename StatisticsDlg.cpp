@@ -33,6 +33,7 @@ void StatisticsDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(StatisticsDlg, CDialog)
+	ON_BN_CLICKED(IDC_REFRESH, &StatisticsDlg::OnBnClickedRefresh)
 END_MESSAGE_MAP()
 
 
@@ -42,6 +43,8 @@ END_MESSAGE_MAP()
 BOOL StatisticsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
+
+	reinterpret_cast<CButton*>(GetDlgItem(IDC_CHECK_MERGE_SINGLE_WND_PROC))->SetCheck(TRUE);
 
 	RefreshData();
 
@@ -54,28 +57,55 @@ void StatisticsDlg::RefreshData()
 {
 	treeStatistics.DeleteAllItems();
 
+	bool isMergingData = reinterpret_cast<CButton*>(GetDlgItem(IDC_CHECK_MERGE_SINGLE_WND_PROC))->GetCheck();
+
 	const auto& infoMap = Watcher::Inst.GetProgramsInfoMap();
 	for (const auto& info : infoMap)
 	{
-		auto progItem = treeStatistics.InsertItem(CString(info.first.c_str()) + " ("+ info.second.GetTotalDurationString(Timestamp(), std::chrono::time_point_cast<Timestamp::duration>(Timestamp::clock::now()))+")");
-		for (const auto& period : info.second.WorkPeriods)
+		HTREEITEM processItem = (info.second.size() > 1 || !isMergingData) ? 
+			treeStatistics.InsertItem(_T("")) : 
+			TVI_ROOT;
+
+		CTimeSpan totalProcessTime = 0;
+		for (const auto& wndData : info.second)
 		{
-			std::time_t tt = std::chrono::system_clock::to_time_t(period.first);
-			std::tm tm;
-			localtime_s(&tm, &tt);
-			std::basic_stringstream<TCHAR> ss;
-			ss << _T("    ") << std::put_time(&tm, _T("%H:%M:%S"));
-			if (period.second.time_since_epoch().count())
+			auto wndTime = wndData.second.GetTotalDuration();
+			totalProcessTime += wndTime;
+			auto progItem = treeStatistics.InsertItem(CString(wndData.first) + wndTime.Format(_T(" (%H:%M:%S)")),processItem);
+			treeStatistics.SetItemData(progItem, IT_WND);
+
+			for (const auto& period : wndData.second.WorkPeriods)
 			{
-				tt = std::chrono::system_clock::to_time_t(period.second);
-				localtime_s(&tm, &tt);
-				ss << _T(" - ") << std::put_time(&tm, _T("%H:%M:%S"));
+				auto periodItem = treeStatistics.InsertItem(period.first.Format(_T("    %H:%M:%S")) +
+					(period.second != 0 ? period.second.Format(_T(" - %H:%M:%S")) : CString(_T(" - now")))
+					, progItem
+				);
+				treeStatistics.SetItemData(periodItem, IT_PERIOD);
 			}
-			else
-			{
-				ss << _T(" - now");
-			}
-			treeStatistics.InsertItem(ss.str().c_str(), progItem);
+		}
+
+		if (processItem != TVI_ROOT)
+		{
+			treeStatistics.SetItemData(processItem, IT_PROC);
+			treeStatistics.SetItemText(processItem, CString(info.first) + totalProcessTime.Format(_T(" (%H:%M:%S)")));
 		}
 	}
+
+	HTREEITEM hItem;
+
+	hItem = treeStatistics.GetRootItem();
+	while (hItem != NULL)
+	{
+		if (treeStatistics.GetItemData(hItem) == IT_PROC)
+		{
+			treeStatistics.Expand(hItem, TVE_EXPAND);
+		}
+		hItem = treeStatistics.GetNextItem(hItem, TVGN_NEXTVISIBLE);
+	}
+}
+
+
+void StatisticsDlg::OnBnClickedRefresh()
+{
+	RefreshData();
 }

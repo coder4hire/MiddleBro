@@ -31,6 +31,10 @@ bool Settings::LoadDataFromFiles(LPCTSTR fileName)
 		d.ParseStream(is);
 		fclose(fp);
 
+		if (d.HasParseError())
+		{
+			return false;
+		}
 
 		if (d.HasMember(LIMITED_NAMES) && d[LIMITED_NAMES].IsArray())
 		{

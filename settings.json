@@ -1,5 +1,5 @@
 {
 	"LimitedNames":["1","2"],
-	"WhiteNames":["MiddleBro","Task Manager"],
-	"BlackNames":["3","4"]
+	"WhiteNames":["middlebro.exe","task switching"],
+	"BlackNames":[".*YouTube.*","4"]
 }

@@ -8,6 +8,14 @@ class StatisticsDlg : public CDialog
 	DECLARE_DYNAMIC(StatisticsDlg)
 
 public:
+	enum ITEM_TYPE
+	{
+		IT_NONE,
+		IT_PROC,
+		IT_WND,
+		IT_PERIOD
+	};
+
 	StatisticsDlg(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~StatisticsDlg();
 
@@ -24,4 +32,5 @@ public:
 	CTreeCtrl treeStatistics;
 	virtual BOOL OnInitDialog();
 	void RefreshData();
+	afx_msg void OnBnClickedRefresh();
 };

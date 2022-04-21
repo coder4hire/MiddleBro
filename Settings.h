@@ -14,7 +14,8 @@ public:
 	std::vector<CString> LimitedNames; // Names that enable limited time counting
 	std::vector<CString> WhiteNames;   // Names that are never counted in limited time (even if they conform to LimitedNames list)
 	std::vector<CString> BlackNames;   // Names of unwanted programs that will trigger sound alarm (and probably will be subject to auto-close - depending on mode)
-	CString ConfigFilesLocation=_T("AAA");
+	CString ConfigFilesLocation=_T(".");
+	CString StatisticsLogsLocation = _T(".");
 	int SecondsBeforeFirstSignal = 300;
 
 protected:
@@ -25,6 +26,7 @@ public:
 	{
 		DEFINE_STRING(ConfigFilesLocation);
 		DEFINE_INT(SecondsBeforeFirstSignal);
+		DEFINE_STRING(StatisticsLogsLocation);
 	}
 };
 

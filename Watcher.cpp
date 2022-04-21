@@ -4,12 +4,14 @@
 #include "Settings.h"
 #include <regex>
 #include <Mmsystem.h>
+#include <psapi.h>
 
 Watcher Watcher::Inst;
 
 Watcher::Watcher()
 {
-    timerID = SetTimer(NULL, 1234, refreshPeriod, [](
+    watchStartTime = CTime::GetCurrentTime();
+    timerID = SetTimer(NULL, 0, refreshPeriod, [](
         HWND hwnd,
         UINT message,
         UINT_PTR idTimer,
@@ -43,6 +45,13 @@ Watcher::~Watcher()
 void Watcher::RefreshWindowsNames()
 {
     windowsNames.clear();
+
+    std::vector<std::basic_regex<TCHAR>> regexps;
+    for (const auto& name : Settings::Inst.WhiteNames)
+    {
+        regexps.emplace_back((LPCTSTR)name, std::regex_constants::icase);
+    }
+
     for (HWND hwnd = ::GetTopWindow(NULL); hwnd != NULL; hwnd = ::GetNextWindow(hwnd, GW_HWNDNEXT))
     {
 
@@ -53,52 +62,70 @@ void Watcher::RefreshWindowsNames()
         if (length == 0)
             continue;
 
-        std::basic_string<TCHAR> title;
-        title.resize(length, ' ');
+        std::basic_string<TCHAR> title(length, ' ');
 
         ::GetWindowText(hwnd, (TCHAR*)title.data(), length + 1);
 
         if (title == _T("Program Manager"))
             continue;
-        windowsNames.push_back(title);
+        if (std::any_of(regexps.begin(), regexps.end(), [&title](std::basic_regex<TCHAR>& re) {return std::regex_match(title, re); }))
+        {
+            continue;
+        }
+
+        const auto& procName = GetProcessName(hwnd);
+        if (std::any_of(regexps.begin(), regexps.end(), [&procName](std::basic_regex<TCHAR>& re) {return std::regex_match((LPCTSTR)procName, re); }))
+        {
+            continue;
+        }
+
+        windowsNames.emplace_back(title.c_str(), procName);
     }
 }
 
 void Watcher::RefreshProgramsInfo()
 {
-    Timestamp now = std::chrono::time_point_cast<Timestamp::duration>(Timestamp::clock::now());
-    for (auto& prog : programsInfoMap)
+    CTime now = CTime::GetCurrentTime();
+    for (auto& process : programsInfoMap)
     {
-        prog.second.IsOpen = false;
+        for (auto& wnd : process.second)
+        wnd.second.IsOpen = false;
     }
 
     // Marking newly appeared programs
     for (auto& name : windowsNames)
     {
-        auto& prog = programsInfoMap.find(name);
-        if (prog != programsInfoMap.end())
+        const auto& processData = programsInfoMap.find(name.second);
+        if(processData != programsInfoMap.end())
         {
-            auto& programInfo = prog->second;
-            if (programInfo.WorkPeriods.empty() || programInfo.WorkPeriods.back().second != Timestamp(std::chrono::milliseconds(0)))
+            auto& wndData = processData->second.find(name.first);
+            if (wndData != processData->second.end())
             {
-                programInfo.WorkPeriods.emplace_back(now, std::chrono::milliseconds(0));
+                auto& programInfo = wndData->second;
+                if (programInfo.WorkPeriods.empty() || programInfo.WorkPeriods.back().second != 0)
+                {
+                    programInfo.WorkPeriods.emplace_back(now, 0);
+                }
+                programInfo.IsOpen = true;
+                continue;
             }
-            programInfo.IsOpen = true;
         }
-        else
-        {
-            auto& programInfo = programsInfoMap[name];
-            programInfo.WorkPeriods.emplace_back(now, std::chrono::milliseconds(0));
-            programInfo.IsOpen = true;
-        }
+
+        // If process/window is not found - add process and window
+        auto& programInfo = programsInfoMap[name.second][name.first];
+        programInfo.WorkPeriods.emplace_back(now, 0);
+        programInfo.IsOpen = true;
     }
     
     // Setting end time for closed programs
-    for (auto& prog : programsInfoMap)
+    for (auto& processData : programsInfoMap)
     {
-        if (!prog.second.IsOpen && !prog.second.WorkPeriods.empty() && prog.second.WorkPeriods.back().second == Timestamp(std::chrono::milliseconds(0)))
+        for (auto& wndData : processData.second)
         {
-            prog.second.WorkPeriods.back().second = now;
+            if (!wndData.second.IsOpen && !wndData.second.WorkPeriods.empty() && wndData.second.WorkPeriods.back().second == 0)
+            {
+                wndData.second.WorkPeriods.back().second = now;
+            }
         }
     }
 }
@@ -107,13 +134,42 @@ bool Watcher::CheckBlackNames()
 {
    for(auto item : Settings::Inst.BlackNames)
    { 
-       std::basic_regex<TCHAR> re((LPCTSTR)item);
-       if (std::any_of(windowsNames.begin(), windowsNames.end(), [&re](const tstring& winName) {
-           return std::regex_match(winName, re); }
+       std::basic_regex<TCHAR> re((LPCTSTR)item, std::regex_constants::icase);
+       if (std::any_of(windowsNames.begin(), windowsNames.end(), [&re](const std::pair<CString, CString>& winNames) {
+           return std::regex_match((LPCTSTR)winNames.first, re) || std::regex_match((LPCTSTR)winNames.second, re); }
        ))
        {
            return true;
        }
    }
    return false;
+}
+
+bool Watcher::SaveStatistics()
+{
+    CFile file(Settings::Inst.StatisticsLogsLocation+_T("\\mblog_")+ watchStartTime.Format("%Y%m%d-%H%M%S.log"), CFile::modeWrite);
+    return false;
+}
+
+CString Watcher::GetProcessName(HWND hWnd)
+{
+    CString buf;
+    DWORD dwProcId = 0;
+
+    GetWindowThreadProcessId(hWnd, &dwProcId);
+
+    HANDLE hProc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, dwProcId);
+    if (hProc)
+    {
+        DWORD sz = 255;
+        DWORD err = QueryFullProcessImageName(hProc, 0, buf.GetBuffer(255), &sz);
+        buf.ReleaseBuffer();
+        CloseHandle(hProc);
+        int pos = buf.ReverseFind(_T('\\'));
+        if (pos != -1)
+        {
+            return buf.Mid(pos + 1);
+        }
+    }
+    return _T("");
 }

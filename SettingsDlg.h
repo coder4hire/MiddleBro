@@ -31,4 +31,7 @@ public:
 	CString valConfigFilesLocation;
 	afx_msg void OnBnClickedButtonGetFolder();
 	unsigned int valSecondsBeforeFirstSignal;
+	afx_msg void OnBnClickedButtonGetFolderStatLogs();
+	void ShowGetFolder(int nID);
+	CString valStatisticsLogsLocation;
 };

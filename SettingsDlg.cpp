@@ -17,6 +17,7 @@ SettingsDlg::SettingsDlg(CWnd* pParent /*=nullptr*/)
 	: CDialog(IDD_SettingsDlg, pParent)
 	, valConfigFilesLocation(_T(""))
 	, valSecondsBeforeFirstSignal(0)
+	, valStatisticsLogsLocation(_T(""))
 {
 
 }
@@ -31,11 +32,13 @@ void SettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_CONFIG_FILES_LOCATION, valConfigFilesLocation);
 	DDX_Text(pDX, IDC_SECONDS_BEFORE_FIRST_SIGNAL, valSecondsBeforeFirstSignal);
 	DDV_MinMaxUInt(pDX, valSecondsBeforeFirstSignal, 5, 1200);
+	DDX_Text(pDX, IDC_STATISTICS_LOGS_LOCATION, valStatisticsLogsLocation);
 }
 
 
 BEGIN_MESSAGE_MAP(SettingsDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_GET_FOLDER, &SettingsDlg::OnBnClickedButtonGetFolder)
+	ON_BN_CLICKED(IDC_BUTTON_GET_FOLDER_STAT_LOGS, &SettingsDlg::OnBnClickedButtonGetFolderStatLogs)
 END_MESSAGE_MAP()
 
 
@@ -65,9 +68,21 @@ void SettingsDlg::OnOK()
 
 void SettingsDlg::OnBnClickedButtonGetFolder()
 {
-	CFolderPickerDialog dlg(_T(""),0,this);
+	ShowGetFolder(IDC_CONFIG_FILES_LOCATION);
+}
+
+void SettingsDlg::OnBnClickedButtonGetFolderStatLogs()
+{
+	ShowGetFolder(IDC_STATISTICS_LOGS_LOCATION);
+}
+
+void SettingsDlg::ShowGetFolder(int nID)
+{
+	CString currentText;
+	GetDlgItem(nID)->GetWindowText(currentText);
+	CFolderPickerDialog dlg(currentText, 0, this);
 	if (dlg.DoModal() == IDOK)
 	{
-		GetDlgItem(IDC_CONFIG_FILES_LOCATION)->SetWindowText(dlg.GetFolderPath());
+		GetDlgItem(nID)->SetWindowText(dlg.GetFolderPath());
 	}
 }
