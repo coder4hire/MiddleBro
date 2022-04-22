@@ -147,7 +147,38 @@ bool Watcher::CheckBlackNames()
 
 bool Watcher::SaveStatistics()
 {
-    CFile file(Settings::Inst.StatisticsLogsLocation+_T("\\mblog_")+ watchStartTime.Format("%Y%m%d-%H%M%S.log"), CFile::modeWrite);
+    FILE* fp = NULL;
+    try
+    {
+        CTime now = CTime::GetCurrentTime();
+        if(!_tfopen_s(&fp, (LPCTSTR)(Settings::Inst.StatisticsLogsLocation + _T("\\mblog_") + watchStartTime.Format("%Y%m%d-%H%M%S.csv")),_T("w,ccs=UTF-16LE")))
+        {
+            _ftprintf(fp,_T("Process;Window;Window time;Periods\n"));
+            for (auto& processData : programsInfoMap)
+            {
+                for (auto& wndData : processData.second)
+                {
+                    _ftprintf(fp,_T("%s;%s;%s;"), (LPCTSTR)processData.first,(LPCTSTR)wndData.first,(LPCTSTR)wndData.second.GetTotalDurationString());
+
+                    for (auto& period : wndData.second.WorkPeriods)
+                    {
+                        _ftprintf(fp, _T("%s - %s"),(LPCTSTR)period.first.Format(_T("%H:%M:%S")),
+                            (LPCTSTR)(period.second != 0 ? period.second :now).Format(_T("%H:%M:%S;")));
+                    }
+                    _ftprintf(fp, _T("\n"));
+                }
+            }
+            fclose(fp);
+            return true;
+        }
+    }
+    catch (...)
+    {
+        if (fp)
+        {
+            fclose(fp);
+        }
+    }
     return false;
 }
 

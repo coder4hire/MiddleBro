@@ -44,6 +44,7 @@ BEGIN_MESSAGE_MAP(CMiddleBroDlg, CDialogTray)
 	ON_COMMAND(ID_DUMMY_EXIT, &CMiddleBroDlg::OnDummyExit)
 	ON_COMMAND(ID_DUMMY_SHOW, &CMiddleBroDlg::OnDummyShow)
 	ON_COMMAND(ID_Menu, &CMiddleBroDlg::OnMenu)
+	ON_WM_POWERBROADCAST()
 END_MESSAGE_MAP()
 
 
@@ -65,10 +66,13 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	}
 
 	startTime = CTime::GetCurrentTime();
-	SetTimer(0, 800, NULL);
+	lastTimeCheck = startTime;
+	SetTimer(0, 900, NULL);
 
 	Tooltip = "MiddleBro";
 	ShowTrayIcon();
+
+	RegisterPowerSettingNotification(GetSafeHwnd(), &GUID_MONITOR_POWER_ON, 0);
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -111,10 +115,16 @@ HCURSOR CMiddleBroDlg::OnQueryDragIcon()
 
 void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	auto tmElapsed = (CTime::GetCurrentTime() - startTime);
-	auto tmLeft = CTimeSpan(timeLimit) - tmElapsed;
+	CTime now = CTime::GetCurrentTime();
+	if (isMonitorOn)
+	{
+		displayTime += now - lastTimeCheck;
+	}
+	lastTimeCheck = now;
 
-	ctrlClock.SetOutputTime(tmLeft, tmElapsed);
+	auto tmLeft = CTimeSpan(timeLimit) - displayTime;
+
+	ctrlClock.SetOutputTime(tmLeft, displayTime);
 	
 	if (tmLeft == Settings::Inst.SecondsBeforeFirstSignal)
 	{
@@ -173,4 +183,18 @@ void CMiddleBroDlg::OnMenu()
 {
 	SettingsDlg dlg(this);
 	dlg.DoModal();
+}
+
+
+UINT CMiddleBroDlg::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
+{
+	if (nPowerEvent == PBT_POWERSETTINGCHANGE)
+	{
+		POWERBROADCAST_SETTING* pbs = (POWERBROADCAST_SETTING*)nEventData;
+		if (pbs->PowerSetting == GUID_MONITOR_POWER_ON)
+		{
+			isMonitorOn = pbs->Data[0] != 0;
+		}
+	}
+	return CDialogTray::OnPowerBroadcast(nPowerEvent, nEventData);
 }

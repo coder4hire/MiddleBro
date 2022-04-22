@@ -6,6 +6,7 @@
 #include "framework.h"
 #include "MiddleBro.h"
 #include "MiddleBroDlg.h"
+#include "Watcher.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -105,3 +106,10 @@ BOOL CMiddleBroApp::InitInstance()
 	return FALSE;
 }
 
+
+
+int CMiddleBroApp::ExitInstance()
+{
+	Watcher::Inst.SaveStatistics();
+	return CWinApp::ExitInstance();
+}

@@ -42,6 +42,9 @@ protected:
 	CTime startTime;
 	
 	int timeLimit = 2100;
+	bool isMonitorOn = true;
+	CTimeSpan displayTime;
+	CTime lastTimeCheck;
 
 	afx_msg void OnDummyExit();
 	afx_msg void OnDummyShow();
@@ -50,4 +53,5 @@ protected:
 public:
 	ClockCtrl ctrlClock;
 	afx_msg void OnMenu();
+	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
 };

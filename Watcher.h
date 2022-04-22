@@ -42,6 +42,7 @@ public:
 	~Watcher();
 	const std::vector<std::pair<CString,CString>>& GetWindowsNames() { return windowsNames; }
 	const ProgramsInfoTree& GetProgramsInfoMap() { return programsInfoMap; }
+	bool SaveStatistics();
 protected:
 	Watcher();
 	ProgramsInfoTree programsInfoMap;
@@ -51,7 +52,6 @@ protected:
 	void RefreshWindowsNames();
 	void RefreshProgramsInfo();
 	bool CheckBlackNames();
-	bool SaveStatistics();
 	CString GetProcessName(HWND hWnd);
 	UINT_PTR timerID = 0;
 	CTime watchStartTime;
