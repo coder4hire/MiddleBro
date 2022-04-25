@@ -5,8 +5,11 @@
 #include "MiddleBro.h"
 #include "BlockingDlg.h"
 #include "afxdialogex.h"
+#include "PwdDlg.h"
 
 BlockingDlg BlockingDlg::dlg;
+
+#define MINIMIZING_TIMEOUT 10000
 
 // BlockingDlg dialog
 
@@ -29,20 +32,12 @@ void BlockingDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(BlockingDlg, CDialog)
-	ON_WM_KILLFOCUS()
 	ON_WM_TIMER()
+	ON_BN_CLICKED(IDC_BUTTON_CONTINUE, &BlockingDlg::OnBnClickedButtonContinue)
 END_MESSAGE_MAP()
 
 
 // BlockingDlg message handlers
-
-
-void BlockingDlg::OnKillFocus(CWnd* pNewWnd)
-{
-	this->SetFocus();
-
-}
-
 
 BOOL BlockingDlg::OnInitDialog()
 {
@@ -56,11 +51,6 @@ BOOL BlockingDlg::OnInitDialog()
 		(screenRect.right + screenRect.left) * 4 / 5,
 		(screenRect.bottom + screenRect.top) * 4 / 5,
 		WS_EX_TOPMOST);
-
-	SetTimer(0, 10000, NULL);
-
-	auto wnd = FindWindow(_T("Shell_TrayWnd"), NULL);
-	wnd->SendMessage(WM_COMMAND, 419, 0); // MIN_ALL
 
 	//CMenu* pSystemMenu = GetSystemMenu(FALSE);
 	//pSystemMenu->EnableMenuItem(SC_MOVE, MF_BYCOMMAND | MF_GRAYED);
@@ -78,14 +68,45 @@ void BlockingDlg::OnTimer(UINT_PTR nIDEvent)
 	CDialog::OnTimer(nIDEvent);
 }
 
-void BlockingDlg::Show()
+void BlockingDlg::Show(LPCTSTR message)
 {
-	if (!dlg)
+	if (!::IsWindow(dlg.GetSafeHwnd()))
 	{
 		dlg.Create(IDD_BlockingDlg);
 	}
-	else
+
+	dlg.GetDlgItem(IDC_STATIC_MESSAGE)->SetWindowText(message);
+	dlg.ShowWindow(SW_SHOW);
+	dlg.SetTimer(0, MINIMIZING_TIMEOUT, NULL);
+	
+	auto wnd = FindWindow(_T("Shell_TrayWnd"), NULL);
+	wnd->SendMessage(WM_COMMAND, 419, 0); // MIN_ALL
+}
+
+BOOL BlockingDlg::DestroyWindow()
+{
+	KillTimer(0);
+	return CDialog::DestroyWindow();
+}
+
+
+void BlockingDlg::OnBnClickedButtonContinue()
+{
+	if (PwdDlg::ShowCheckPwd(_T("cont")))
 	{
-		dlg.ShowWindow(WM_SHOWWINDOW);
+		KillTimer(0);
+		AfxGetMainWnd()->SendMessage(WM_BLOCKING_REMOVED);
+		DestroyWindow();
+		return;
 	}
+}
+
+
+void BlockingDlg::OnOK()
+{
+}
+
+
+void BlockingDlg::OnCancel()
+{
 }

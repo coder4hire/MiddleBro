@@ -29,8 +29,10 @@
 #define IDC_BUTTON_GET_FOLDER           1007
 #define IDC_BUTTON_GET_FOLDER_STAT_LOGS 1008
 #define IDC_REFRESH                     1008
-#define IDC_CHECK1                      1009
 #define IDC_CHECK_MERGE_SINGLE_WND_PROC 1009
+#define IDC_STATIC_MESSAGE              1010
+#define IDC_BUTTON1                     1011
+#define IDC_BUTTON_CONTINUE             1011
 #define ID_DUMMY_SETTINGS               32771
 #define ID_DUMMY_EXIT                   32772
 #define ID_DUMMY_SHOW                   32773
@@ -42,7 +44,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        143
 #define _APS_NEXT_COMMAND_VALUE         32775
-#define _APS_NEXT_CONTROL_VALUE         1010
+#define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           107
 #endif
 #endif

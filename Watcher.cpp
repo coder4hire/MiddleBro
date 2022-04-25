@@ -105,6 +105,7 @@ void Watcher::RefreshProgramsInfo()
                 if (programInfo.WorkPeriods.empty() || programInfo.WorkPeriods.back().second != 0)
                 {
                     programInfo.WorkPeriods.emplace_back(now, 0);
+                    CheckAndSaveStatistics(name.second);
                 }
                 programInfo.IsOpen = true;
                 continue;
@@ -115,6 +116,7 @@ void Watcher::RefreshProgramsInfo()
         auto& programInfo = programsInfoMap[name.second][name.first];
         programInfo.WorkPeriods.emplace_back(now, 0);
         programInfo.IsOpen = true;
+        CheckAndSaveStatistics(name.second);
     }
     
     // Setting end time for closed programs
@@ -203,4 +205,12 @@ CString Watcher::GetProcessName(HWND hWnd)
         }
     }
     return _T("");
+}
+
+void Watcher::CheckAndSaveStatistics(const CString& processName)
+{
+    if (processName == _T("Taskmgr.exe"))
+    {
+        SaveStatistics();
+    }
 }

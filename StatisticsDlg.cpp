@@ -34,6 +34,7 @@ void StatisticsDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(StatisticsDlg, CDialog)
 	ON_BN_CLICKED(IDC_REFRESH, &StatisticsDlg::OnBnClickedRefresh)
+	ON_BN_CLICKED(IDC_CHECK_MERGE_SINGLE_WND_PROC, &StatisticsDlg::OnBnClickedCheckMergeSingleWndProc)
 END_MESSAGE_MAP()
 
 
@@ -106,6 +107,19 @@ void StatisticsDlg::RefreshData()
 
 
 void StatisticsDlg::OnBnClickedRefresh()
+{
+	RefreshData();
+}
+
+
+void StatisticsDlg::OnCancel()
+{
+	CDialog::OnCancel();
+	DestroyWindow();
+}
+
+
+void StatisticsDlg::OnBnClickedCheckMergeSingleWndProc()
 {
 	RefreshData();
 }

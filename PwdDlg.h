@@ -22,7 +22,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	CString pwd;
 public:
-	virtual INT_PTR DoModal();
 	static bool ShowCheckPwd(const CString& pwd);
 	CString enteredPwd;
+	virtual void OnOK();
 };

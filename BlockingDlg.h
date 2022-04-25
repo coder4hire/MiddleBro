@@ -2,6 +2,7 @@
 
 
 // BlockingDlg dialog
+#define WM_BLOCKING_REMOVED WM_USER+2
 
 class BlockingDlg : public CDialog
 {
@@ -21,11 +22,14 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnKillFocus(CWnd* pNewWnd);
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
-	static void Show();
+	static void Show(LPCTSTR message);
 	
 	static BlockingDlg dlg;
+	virtual BOOL DestroyWindow();
+	afx_msg void OnBnClickedButtonContinue();
+	virtual void OnOK();
+	virtual void OnCancel();
 };

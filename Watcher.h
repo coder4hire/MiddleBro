@@ -53,6 +53,7 @@ protected:
 	void RefreshProgramsInfo();
 	bool CheckBlackNames();
 	CString GetProcessName(HWND hWnd);
+	void CheckAndSaveStatistics(const CString& processName);
 	UINT_PTR timerID = 0;
 	CTime watchStartTime;
 };

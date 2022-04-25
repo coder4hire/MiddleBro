@@ -33,4 +33,6 @@ public:
 	virtual BOOL OnInitDialog();
 	void RefreshData();
 	afx_msg void OnBnClickedRefresh();
+	virtual void OnCancel();
+	afx_msg void OnBnClickedCheckMergeSingleWndProc();
 };

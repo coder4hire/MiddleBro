@@ -35,14 +35,23 @@ END_MESSAGE_MAP()
 
 // PwdDlg message handlers
 
-
-INT_PTR PwdDlg::DoModal()
-{
-	return CDialog::DoModal() == IDOK && pwd == enteredPwd;
-}
-
 bool PwdDlg::ShowCheckPwd(const CString& pwd)
 {
 	PwdDlg dlg(pwd);
-	return dlg.DoModal();
+	return dlg.DoModal() == IDOK;
+}
+
+
+void PwdDlg::OnOK()
+{
+	UpdateData(TRUE);
+	if (pwd == enteredPwd)
+	{
+		CDialog::OnOK();
+	}
+	else
+	{
+		SetWindowText(_T("Incorrect password ! Re-enter please"));
+		FlashWindow(false);
+	}
 }

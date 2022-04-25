@@ -8,7 +8,6 @@
 #include "MiddleBroDlg.h"
 #include "afxdialogex.h"
 
-#include "StatisticsDlg.h"
 #include "PwdDlg.h"
 #include "Settings.h"
 #include "SettingsDlg.h"
@@ -45,10 +44,18 @@ BEGIN_MESSAGE_MAP(CMiddleBroDlg, CDialogTray)
 	ON_COMMAND(ID_DUMMY_SHOW, &CMiddleBroDlg::OnDummyShow)
 	ON_COMMAND(ID_Menu, &CMiddleBroDlg::OnMenu)
 	ON_WM_POWERBROADCAST()
+	ON_MESSAGE(WM_BLOCKING_REMOVED, &CMiddleBroDlg::OnBlockingRemoved)
 END_MESSAGE_MAP()
 
 
 // CMiddleBroDlg message handlers
+
+void CMiddleBroDlg::RestartCounters()
+{
+	SetTimer(0, 900, NULL);
+	displayTime = 0;
+	lastTimeCheck = CTime::GetCurrentTime();
+}
 
 BOOL CMiddleBroDlg::OnInitDialog()
 {
@@ -67,7 +74,7 @@ BOOL CMiddleBroDlg::OnInitDialog()
 
 	startTime = CTime::GetCurrentTime();
 	lastTimeCheck = startTime;
-	SetTimer(0, 900, NULL);
+	RestartCounters();
 
 	Tooltip = "MiddleBro";
 	ShowTrayIcon();
@@ -142,8 +149,8 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 			SND_RESOURCE | SND_ASYNC);
 		ShowBaloon(_T("Middle Bro"), _T("Session time is over."));
 		Sleep(3000);
-		OnTimeExpired();
 		KillTimer(0);
+		OnTimeExpired();
 	}
 
 	CDialogTray::OnTimer(nIDEvent);
@@ -152,8 +159,15 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CMiddleBroDlg::OnBnClickedButtonStat()
 {
-	StatisticsDlg dlg;
-	dlg.DoModal();
+	if (!statDlg)
+	{
+		statDlg.Create(IDD_StatisticsDlg);
+	}
+	else
+	{
+		statDlg.ShowWindow(SW_SHOW);
+		statDlg.SetFocus();
+	}
 }
 
 
@@ -175,7 +189,8 @@ void CMiddleBroDlg::OnDummyShow()
 
 void CMiddleBroDlg::OnTimeExpired()
 {
-	BlockingDlg::Show();
+	Watcher::Inst.SaveStatistics();
+	BlockingDlg::Show(_T("Выключай комп и делай зарядку для глаз !!!"));
 }
 
 
@@ -197,4 +212,11 @@ UINT CMiddleBroDlg::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
 		}
 	}
 	return CDialogTray::OnPowerBroadcast(nPowerEvent, nEventData);
+}
+
+
+afx_msg LRESULT CMiddleBroDlg::OnBlockingRemoved(WPARAM wParam, LPARAM lParam)
+{
+	RestartCounters();
+	return 0;
 }
