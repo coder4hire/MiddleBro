@@ -11,6 +11,7 @@
 #include "BlockingDlg.h"
 #include "ClockCtrl.h"
 #include "StatisticsDlg.h"
+#include "SettingsDlg.h"
 
 // CMiddleBroDlg dialog
 class CMiddleBroDlg : public CDialogTray
@@ -39,11 +40,9 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	afx_msg void OnBnClickedButtonStat();
 	
 	CTime startTime;
 	
-	int timeLimit = 25;// 2100;
 	bool isMonitorOn = true;
 	CTimeSpan displayTime;
 	CTime lastTimeCheck;
@@ -53,11 +52,14 @@ protected:
 
 	void OnTimeExpired();
 	StatisticsDlg statDlg;
+	SettingsDlg settingsDlg;
 
 public:
 	ClockCtrl ctrlClock;
-	afx_msg void OnMenu();
+	afx_msg void OnDummySettings();
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
 protected:
 	afx_msg LRESULT OnBlockingRemoved(WPARAM wParam, LPARAM lParam);
+public:
+	afx_msg void OnDummyStatistics();
 };

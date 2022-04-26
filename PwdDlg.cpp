@@ -52,6 +52,8 @@ void PwdDlg::OnOK()
 	else
 	{
 		SetWindowText(_T("Incorrect password ! Re-enter please"));
+		enteredPwd = _T("");
+		UpdateData(FALSE);
 		FlashWindow(false);
 	}
 }

@@ -68,7 +68,7 @@ void BlockingDlg::OnTimer(UINT_PTR nIDEvent)
 	CDialog::OnTimer(nIDEvent);
 }
 
-void BlockingDlg::Show(LPCTSTR message)
+void BlockingDlg::Show(const CString& message)
 {
 	if (!::IsWindow(dlg.GetSafeHwnd()))
 	{
@@ -92,13 +92,17 @@ BOOL BlockingDlg::DestroyWindow()
 
 void BlockingDlg::OnBnClickedButtonContinue()
 {
-	if (PwdDlg::ShowCheckPwd(_T("cont")))
+	KillTimer(0);
+	dlg.SetTimer(0, 2*MINIMIZING_TIMEOUT, NULL);
+	if (PwdDlg::ShowCheckPwd(MAIN_PWD))
 	{
 		KillTimer(0);
 		AfxGetMainWnd()->SendMessage(WM_BLOCKING_REMOVED);
 		DestroyWindow();
 		return;
 	}
+	KillTimer(0);
+	dlg.SetTimer(0, MINIMIZING_TIMEOUT, NULL);
 }
 
 

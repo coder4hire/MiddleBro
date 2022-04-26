@@ -3,6 +3,9 @@
 
 // PwdDlg dialog
 
+#define EXIT_PWD _T("exit")
+#define MAIN_PWD _T("set")
+
 class PwdDlg : public CDialog
 {
 	DECLARE_DYNAMIC(PwdDlg)

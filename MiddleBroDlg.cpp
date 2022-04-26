@@ -10,7 +10,6 @@
 
 #include "PwdDlg.h"
 #include "Settings.h"
-#include "SettingsDlg.h"
 #include <Mmsystem.h>
 
 #ifdef _DEBUG
@@ -39,12 +38,12 @@ BEGIN_MESSAGE_MAP(CMiddleBroDlg, CDialogTray)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_TIMER()
 	ON_WM_CLOSE()
-	ON_BN_CLICKED(IDC_BUTTON_STAT, &CMiddleBroDlg::OnBnClickedButtonStat)
 	ON_COMMAND(ID_DUMMY_EXIT, &CMiddleBroDlg::OnDummyExit)
 	ON_COMMAND(ID_DUMMY_SHOW, &CMiddleBroDlg::OnDummyShow)
-	ON_COMMAND(ID_Menu, &CMiddleBroDlg::OnMenu)
+	ON_COMMAND(ID_DUMMY_SETTINGS, &CMiddleBroDlg::OnDummySettings)
 	ON_WM_POWERBROADCAST()
 	ON_MESSAGE(WM_BLOCKING_REMOVED, &CMiddleBroDlg::OnBlockingRemoved)
+	ON_COMMAND(ID_DUMMY_STATISTICS, &CMiddleBroDlg::OnDummyStatistics)
 END_MESSAGE_MAP()
 
 
@@ -129,7 +128,7 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 	lastTimeCheck = now;
 
-	auto tmLeft = CTimeSpan(timeLimit) - displayTime;
+	auto tmLeft = CTimeSpan(Settings::Inst.DailyTimeLimit) - displayTime;
 
 	ctrlClock.SetOutputTime(tmLeft, displayTime);
 	
@@ -157,24 +156,10 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 }
 
 
-void CMiddleBroDlg::OnBnClickedButtonStat()
-{
-	if (!statDlg)
-	{
-		statDlg.Create(IDD_StatisticsDlg);
-	}
-	else
-	{
-		statDlg.ShowWindow(SW_SHOW);
-		statDlg.SetFocus();
-	}
-}
-
-
 void CMiddleBroDlg::OnDummyExit()
 {
 	//TODO: change to real password from settings
-	if (PwdDlg::ShowCheckPwd(_T("exit")))
+	if (PwdDlg::ShowCheckPwd(EXIT_PWD))
 	{
 		RemoveTrayIcon();
 		CDialogEx::OnCancel();
@@ -190,14 +175,20 @@ void CMiddleBroDlg::OnDummyShow()
 void CMiddleBroDlg::OnTimeExpired()
 {
 	Watcher::Inst.SaveStatistics();
-	BlockingDlg::Show(_T("Выключай комп и делай зарядку для глаз !!!"));
+	BlockingDlg::Show(MAKEINTRESOURCE(IDS_STRING_TURN_OFF_WARNING));
 }
 
 
-void CMiddleBroDlg::OnMenu()
+void CMiddleBroDlg::OnDummySettings()
 {
-	SettingsDlg dlg(this);
-	dlg.DoModal();
+	if (!settingsDlg && PwdDlg::ShowCheckPwd(MAIN_PWD))
+	{
+		settingsDlg.DoModal();
+	}
+	else
+	{
+		settingsDlg.SetFocus();
+	}
 }
 
 
@@ -219,4 +210,18 @@ afx_msg LRESULT CMiddleBroDlg::OnBlockingRemoved(WPARAM wParam, LPARAM lParam)
 {
 	RestartCounters();
 	return 0;
+}
+
+
+void CMiddleBroDlg::OnDummyStatistics()
+{
+	if (!statDlg)
+	{
+		statDlg.Create(IDD_StatisticsDlg);
+	}
+	else
+	{
+		statDlg.ShowWindow(SW_SHOW);
+		statDlg.SetFocus();
+	}
 }

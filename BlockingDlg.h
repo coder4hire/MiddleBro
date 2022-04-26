@@ -25,7 +25,7 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
-	static void Show(LPCTSTR message);
+	static void Show(const CString& message);
 	
 	static BlockingDlg dlg;
 	virtual BOOL DestroyWindow();

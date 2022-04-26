@@ -34,4 +34,5 @@ public:
 	afx_msg void OnBnClickedButtonGetFolderStatLogs();
 	void ShowGetFolder(int nID);
 	CString valStatisticsLogsLocation;
+	unsigned int valDailyTimeLimit;
 };
