@@ -56,15 +56,21 @@ void ClockCtrl::OnPaint()
 	dc.SetBkMode(OPAQUE);
 	dc.SetBkColor(GetSysColor(COLOR_3DFACE));
 	dc.SetTextColor(0x00008000);
-	dc.TextOut(5, 5, timeLeft.Format("%H:%M:%S"));
+	dc.TextOut(5, 5, limitedTimeLeft.Format("%H:%M:%S"));
+	CSize bigTextSize = dc.GetTextExtent(_T("A"));
+
 	dc.SelectObject(oldFont);
+	CSize smallTextSize = dc.GetTextExtent(_T("A"));
+	dc.SetTextColor(0xC00000);
+	dc.TextOut(5, bigTextSize.cy + 10, workTimeLeft.Format("%H:%M:%S"));
 	dc.SetTextColor(0);
-	dc.TextOut(5, 35, timeElapsed.Format("%H:%M:%S"));
+	dc.TextOut(5, bigTextSize.cy + smallTextSize.cy + 15, timeElapsed.Format("%H:%M:%S"));
 }
 
-void ClockCtrl::SetOutputTime(const CTimeSpan& timeLeft, const CTimeSpan& timeElapsed)
+void ClockCtrl::SetOutputTime(const CTimeSpan& limitedTimeLeft, const CTimeSpan& workTimeLeft, const CTimeSpan& timeElapsed)
 {
-	this->timeLeft = timeLeft;
+	this->limitedTimeLeft = limitedTimeLeft;
+	this->workTimeLeft = workTimeLeft;
 	this->timeElapsed = timeElapsed;
 	Invalidate();
 }

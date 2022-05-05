@@ -4,6 +4,12 @@
 // BlockingDlg dialog
 #define WM_BLOCKING_REMOVED WM_USER+2
 
+enum BLOCKING_CASES
+{
+	BC_BREAK,
+	BC_NO_MORE_LIMITED_TIME
+};
+
 class BlockingDlg : public CDialog
 {
 	DECLARE_DYNAMIC(BlockingDlg)
@@ -25,7 +31,8 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
-	static void Show(const CString& message);
+	static void Show(DWORD id, const CString& message);
+	static bool IsVisible() { return ::IsWindow(dlg.GetSafeHwnd()); }
 	
 	static BlockingDlg dlg;
 	virtual BOOL DestroyWindow();
@@ -34,6 +41,7 @@ public:
 	virtual void OnCancel();
 
 protected:
+	DWORD id = 0xFFFFFFFF;
 	CRect calculatedRect;
 public:
 //	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);

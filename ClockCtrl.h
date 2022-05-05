@@ -15,10 +15,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnPaint();
-	void SetOutputTime(const CTimeSpan& timeLeft, const CTimeSpan& timeElapsed);
+	void SetOutputTime(const CTimeSpan& limitedTimeLeft, const CTimeSpan& workTimeLeft, const CTimeSpan& timeElapsed);
 
 protected:
-	CTimeSpan timeLeft;
+	CTimeSpan limitedTimeLeft;
+	CTimeSpan workTimeLeft;
 	CTimeSpan timeElapsed;
 	CFont font;
 };

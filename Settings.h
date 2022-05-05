@@ -17,7 +17,8 @@ public:
 	CString ConfigFilesLocation=_T(".");
 	CString StatisticsLogsLocation = _T(".");
 	int SecondsBeforeFirstSignal = 300;
-	int DailyTimeLimit = 2100;
+	int DailyTimeLimit = 3600;
+	int WorkTimeLimit = 1860;
 
 protected:
 	Settings() {}
@@ -29,6 +30,7 @@ public:
 		DEFINE_INT(SecondsBeforeFirstSignal);
 		DEFINE_STRING(StatisticsLogsLocation);
 		DEFINE_INT(DailyTimeLimit);
+		DEFINE_INT(WorkTimeLimit);
 	}
 };
 

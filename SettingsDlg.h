@@ -35,4 +35,5 @@ public:
 	void ShowGetFolder(int nID);
 	CString valStatisticsLogsLocation;
 	unsigned int valDailyTimeLimit;
+	unsigned int valWorkTimeLimit;
 };

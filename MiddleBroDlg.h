@@ -34,7 +34,6 @@ protected:
 	HICON m_hIcon;
 
 	// Generated message map functions
-	void RestartCounters();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -45,6 +44,8 @@ protected:
 	
 	bool isMonitorOn = true;
 	CTimeSpan displayTime;
+	CTimeSpan limitedTime;
+	CTimeSpan workTime;
 	CTime lastTimeCheck;
 
 	afx_msg void OnDummyExit();

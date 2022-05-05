@@ -14,6 +14,7 @@
 #define IDR_WAVE_END                    138
 #define IDR_WAVE_WARNING                142
 #define IDS_STRING_TURN_OFF_WARNING     143
+#define IDS_STRING_MAKE_A_BREAK         144
 #define IDC_EDIT1                       1000
 #define IDC_OUT                         1000
 #define IDC_EDIT_PWD                    1000
@@ -28,6 +29,7 @@
 #define IDC_DAILY_TIME_LIMIT            1003
 #define IDC_STATIC_TIME_LEFT            1004
 #define IDC_STATIC_TIME                 1004
+#define IDC_WORK_TIME_LIMIT             1004
 #define IDC_STATIC_TIME_ELAPSED         1005
 #define IDC_BUTTON_GET_FOLDER           1007
 #define IDC_BUTTON_GET_FOLDER_STAT_LOGS 1008

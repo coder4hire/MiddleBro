@@ -76,13 +76,21 @@ void BlockingDlg::OnTimer(UINT_PTR nIDEvent)
 	CDialog::OnTimer(nIDEvent);
 }
 
-void BlockingDlg::Show(const CString& message)
+void BlockingDlg::Show(DWORD id, const CString& message)
 {
 	if (!::IsWindow(dlg.GetSafeHwnd()))
 	{
 		dlg.Create(IDD_BlockingDlg);
 	}
+	else
+	{
+		if (dlg.id != 0xFFFFFFFF)
+		{
+			AfxGetMainWnd()->SendMessage(WM_BLOCKING_REMOVED, dlg.id);
+		}
+	}
 
+	dlg.id = id;
 	dlg.GetDlgItem(IDC_STATIC_MESSAGE)->SetWindowText(message);
 	dlg.ShowWindow(SW_SHOW);
 	dlg.SetTimer(0, MINIMIZING_TIMEOUT, NULL);
@@ -105,7 +113,8 @@ void BlockingDlg::OnBnClickedButtonContinue()
 	if (PwdDlg::ShowCheckPwd(MAIN_PWD))
 	{
 		KillTimer(0);
-		AfxGetMainWnd()->SendMessage(WM_BLOCKING_REMOVED);
+		AfxGetMainWnd()->SendMessage(WM_BLOCKING_REMOVED,id);
+		id = 0xFFFFFFFF;
 		DestroyWindow();
 		return;
 	}
@@ -122,13 +131,6 @@ void BlockingDlg::OnOK()
 void BlockingDlg::OnCancel()
 {
 }
-
-//void BlockingDlg::OnSizing(UINT fwSide, LPRECT pRect)
-//{
-//	CDialog::OnSizing(fwSide, &calculatedRect);
-//
-//	// TODO: Add your message handler code here
-//}
 
 
 void BlockingDlg::OnSize(UINT nType, int cx, int cy)

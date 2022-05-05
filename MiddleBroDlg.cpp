@@ -49,13 +49,6 @@ END_MESSAGE_MAP()
 
 // CMiddleBroDlg message handlers
 
-void CMiddleBroDlg::RestartCounters()
-{
-	SetTimer(0, 900, NULL);
-	displayTime = 0;
-	lastTimeCheck = CTime::GetCurrentTime();
-}
-
 BOOL CMiddleBroDlg::OnInitDialog()
 {
 	CDialogTray::OnInitDialog();
@@ -73,7 +66,12 @@ BOOL CMiddleBroDlg::OnInitDialog()
 
 	startTime = CTime::GetCurrentTime();
 	lastTimeCheck = startTime;
-	RestartCounters();
+	displayTime = 0;
+	lastTimeCheck = startTime;
+	workTime = 0;
+	limitedTime = 0;
+
+	SetTimer(0, 900, NULL);
 
 	Tooltip = "MiddleBro";
 	ShowTrayIcon();
@@ -125,32 +123,67 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 	if (isMonitorOn)
 	{
 		displayTime += now - lastTimeCheck;
+
+		if (!BlockingDlg::IsVisible())
+		{
+			limitedTime += now - lastTimeCheck;
+		}
+		workTime += now - lastTimeCheck;
 	}
 	lastTimeCheck = now;
 
-	auto tmLeft = CTimeSpan(Settings::Inst.DailyTimeLimit) - displayTime;
+	auto limitedTimeLeft = CTimeSpan(Settings::Inst.DailyTimeLimit) -limitedTime;
+	if (limitedTimeLeft < 0)
+	{
+		limitedTimeLeft = 0;
+	}
+	auto workTimeLeft = CTimeSpan(Settings::Inst.WorkTimeLimit) - workTime;
+	if (workTimeLeft < 0)
+	{
+		workTimeLeft = 0;
+	}
 
-	ctrlClock.SetOutputTime(tmLeft, displayTime);
+	ctrlClock.SetOutputTime(limitedTimeLeft, workTimeLeft, displayTime);
 	
-	if (tmLeft == Settings::Inst.SecondsBeforeFirstSignal)
+	if (limitedTimeLeft == Settings::Inst.SecondsBeforeFirstSignal)
 	{
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
 			GetModuleHandle(NULL), 
 			SND_RESOURCE | SND_ASYNC);
 
-		ShowBaloon(_T("Middle Bro"), _T("Session will be blocked soon.\r\nTime left: " + tmLeft.Format("%H:%M:%S")));
+		ShowBaloon(_T("Middle Bro"), _T("Session will be blocked soon.\r\nTime left: " + limitedTimeLeft.Format("%H:%M:%S")));
 	}
 
-	if (tmLeft <= 0)
+	if (limitedTimeLeft == 0 && !BlockingDlg::IsVisible())
 	{
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_END),
 			GetModuleHandle(NULL),
 			SND_RESOURCE | SND_ASYNC);
 		ShowBaloon(_T("Middle Bro"), _T("Session time is over."));
-		Sleep(3000);
-		KillTimer(0);
+		Sleep(2000);
 		OnTimeExpired();
 	}
+
+	if (workTimeLeft == Settings::Inst.SecondsBeforeFirstSignal)
+	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
+			GetModuleHandle(NULL),
+			SND_RESOURCE | SND_ASYNC);
+
+		ShowBaloon(_T("Middle Bro"), _T("You need to make break soon.\r\nTime left: " + workTimeLeft.Format("%H:%M:%S")));
+	}
+
+	if (workTimeLeft == 0 && !BlockingDlg::IsVisible())
+	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_END),
+			GetModuleHandle(NULL),
+			SND_RESOURCE | SND_ASYNC);
+		ShowBaloon(_T("Middle Bro"), _T("Time to make a break."));
+		Sleep(2000);
+		Watcher::Inst.SaveStatistics();
+		BlockingDlg::Show(BC_BREAK, MAKEINTRESOURCE(IDS_STRING_MAKE_A_BREAK));
+	}
+
 
 	CDialogTray::OnTimer(nIDEvent);
 }
@@ -175,7 +208,7 @@ void CMiddleBroDlg::OnDummyShow()
 void CMiddleBroDlg::OnTimeExpired()
 {
 	Watcher::Inst.SaveStatistics();
-	BlockingDlg::Show(MAKEINTRESOURCE(IDS_STRING_TURN_OFF_WARNING));
+	BlockingDlg::Show(BC_NO_MORE_LIMITED_TIME,MAKEINTRESOURCE(IDS_STRING_TURN_OFF_WARNING));
 }
 
 
@@ -208,7 +241,16 @@ UINT CMiddleBroDlg::OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData)
 
 afx_msg LRESULT CMiddleBroDlg::OnBlockingRemoved(WPARAM wParam, LPARAM lParam)
 {
-	RestartCounters();
+	switch (wParam)
+	{
+	case BC_BREAK:
+		workTime = 0;
+		break;
+	case BC_NO_MORE_LIMITED_TIME:
+		limitedTime = 0;
+		break;
+	}
+	lastTimeCheck = CTime::GetCurrentTime();
 	return 0;
 }
 

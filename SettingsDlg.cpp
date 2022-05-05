@@ -19,6 +19,7 @@ SettingsDlg::SettingsDlg(CWnd* pParent /*=nullptr*/)
 	, valSecondsBeforeFirstSignal(0)
 	, valStatisticsLogsLocation(_T(""))
 	, valDailyTimeLimit(0)
+	, valWorkTimeLimit(0)
 {
 
 }
@@ -36,6 +37,8 @@ void SettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_STATISTICS_LOGS_LOCATION, valStatisticsLogsLocation);
 	DDX_Text(pDX, IDC_DAILY_TIME_LIMIT, valDailyTimeLimit);
 	DDV_MinMaxUInt(pDX, valDailyTimeLimit, 5, 86400);
+	DDX_Text(pDX, IDC_WORK_TIME_LIMIT, valWorkTimeLimit);
+	DDV_MinMaxUInt(pDX, valWorkTimeLimit, 5, 86400);
 }
 
 
