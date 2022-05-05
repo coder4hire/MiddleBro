@@ -34,6 +34,8 @@ void BlockingDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(BlockingDlg, CDialog)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON_CONTINUE, &BlockingDlg::OnBnClickedButtonContinue)
+//	ON_WM_SIZING()
+ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -42,18 +44,19 @@ END_MESSAGE_MAP()
 BOOL BlockingDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	RECT screenRect, rect;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &screenRect, 0);
-	GetWindowRect(&rect);
 
-	this->SetWindowPos(&wndTopMost, (screenRect.right - screenRect.left) / 10,
+	RECT screenRect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &screenRect, 0);
+
+	calculatedRect = CRect((screenRect.right - screenRect.left) / 10,
 		(screenRect.bottom - screenRect.top) / 10,
-		(screenRect.right + screenRect.left) * 4 / 5,
-		(screenRect.bottom + screenRect.top) * 4 / 5,
+		(screenRect.right - screenRect.left) * 9 / 10,
+		(screenRect.bottom - screenRect.top) * 9 / 10);
+
+	this->SetWindowPos(&wndTopMost, calculatedRect.left, calculatedRect.top, 
+		calculatedRect.Width(), calculatedRect.Height(),
 		WS_EX_TOPMOST);
 
-	//CMenu* pSystemMenu = GetSystemMenu(FALSE);
-	//pSystemMenu->EnableMenuItem(SC_MOVE, MF_BYCOMMAND | MF_GRAYED);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
@@ -64,6 +67,11 @@ void BlockingDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	auto wnd = FindWindow(_T("Shell_TrayWnd"), NULL);
 	wnd->SendMessage(WM_COMMAND, 419, 0); // MIN_ALL
+
+	this->SetWindowPos(&wndTopMost, calculatedRect.left, calculatedRect.top,
+		calculatedRect.Width(), calculatedRect.Height(),
+		WS_EX_TOPMOST);
+	this->SetFocus();
 
 	CDialog::OnTimer(nIDEvent);
 }
@@ -113,4 +121,29 @@ void BlockingDlg::OnOK()
 
 void BlockingDlg::OnCancel()
 {
+}
+
+//void BlockingDlg::OnSizing(UINT fwSide, LPRECT pRect)
+//{
+//	CDialog::OnSizing(fwSide, &calculatedRect);
+//
+//	// TODO: Add your message handler code here
+//}
+
+
+void BlockingDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialog::OnSize(nType, cx, cy);
+
+	CRect rect;
+	if (GetDlgItem(IDC_STATIC_MESSAGE) && GetDlgItem(IDC_BUTTON_CONTINUE))
+	{
+		GetDlgItem(IDC_STATIC_MESSAGE)->GetWindowRect(&rect);
+		GetDlgItem(IDC_STATIC_MESSAGE)->MoveWindow(15, (calculatedRect.Height() - rect.Height()) / 2,
+			calculatedRect.Width() - 30, rect.Height());
+
+		GetDlgItem(IDC_BUTTON_CONTINUE)->GetWindowRect(&rect);
+		GetDlgItem(IDC_BUTTON_CONTINUE)->SetWindowPos(NULL, (calculatedRect.Width() - rect.Width()) - 15, (calculatedRect.Height() - rect.Height()) - 15,
+			0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	}
 }

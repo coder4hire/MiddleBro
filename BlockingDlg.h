@@ -32,4 +32,10 @@ public:
 	afx_msg void OnBnClickedButtonContinue();
 	virtual void OnOK();
 	virtual void OnCancel();
+
+protected:
+	CRect calculatedRect;
+public:
+//	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
 };
