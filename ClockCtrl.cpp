@@ -52,6 +52,11 @@ void ClockCtrl::OnPaint()
 	CPaintDC dc(this); // device context for painting
 					   // TODO: Add your message handler code here
 					   // Do not call CStatic::OnPaint() for painting messages
+
+	RECT rect;
+	GetClientRect(&rect);
+	dc.FillSolidRect(&rect, GetSysColor(COLOR_3DFACE));
+
 	auto oldFont = dc.SelectObject(font);
 	dc.SetBkMode(OPAQUE);
 	dc.SetBkColor(GetSysColor(COLOR_3DFACE));

@@ -37,7 +37,6 @@ BEGIN_MESSAGE_MAP(CMiddleBroDlg, CDialogTray)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_TIMER()
-	ON_WM_CLOSE()
 	ON_COMMAND(ID_DUMMY_EXIT, &CMiddleBroDlg::OnDummyExit)
 	ON_COMMAND(ID_DUMMY_SHOW, &CMiddleBroDlg::OnDummyShow)
 	ON_COMMAND(ID_DUMMY_SETTINGS, &CMiddleBroDlg::OnDummySettings)
@@ -67,11 +66,24 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	startTime = CTime::GetCurrentTime();
 	lastTimeCheck = startTime;
 	displayTime = 0;
-	lastTimeCheck = startTime;
 	workTime = 0;
-	limitedTime = 0;
 
+	int lastSavedDay = theApp.GetProfileInt(_T("Runtime"), _T("DateSaved"), 0);
+	int nowDay = (int)(CTime::GetCurrentTime().GetTime() / 3600);
+	if (lastSavedDay != nowDay)
+	{
+		limitedTime = 0;
+		theApp.WriteProfileInt(_T("Runtime"), _T("DateSaved"), nowDay);
+		theApp.WriteProfileInt(_T("Runtime"), _T("LimitedTime"), 0);
+	}
+	else
+	{
+		limitedTime = theApp.GetProfileInt(_T("Runtime"), _T("LimitedTime"), 0);
+	}
+
+	srand(nowDay);
 	SetTimer(0, 900, NULL);
+	ShowTimeLeft();
 
 	Tooltip = "MiddleBro";
 	ShowTrayIcon();
@@ -120,6 +132,13 @@ HCURSOR CMiddleBroDlg::OnQueryDragIcon()
 void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	CTime now = CTime::GetCurrentTime();
+
+	if (lastTimeCheck.GetDay() != now.GetDay())
+	{
+		theApp.WriteProfileInt(_T("Runtime"), _T("DateSaved"), (int)(now.GetTime()/3600));
+		limitedTime = 0;
+	}
+
 	if (isMonitorOn)
 	{
 		displayTime += now - lastTimeCheck;
@@ -130,9 +149,23 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 		}
 		workTime += now - lastTimeCheck;
 	}
+
+	if (!(limitedTime.GetTotalSeconds() % timeSaveThreshold))
+	{
+		timeSaveThreshold = (rand() * 600 / RAND_MAX + 30);
+		theApp.WriteProfileInt(_T("Runtime"), _T("LimitedTime"), (int)(limitedTime.GetTotalSeconds()));
+	}
+
 	lastTimeCheck = now;
 
-	auto limitedTimeLeft = CTimeSpan(Settings::Inst.DailyTimeLimit) -limitedTime;
+	ShowTimeLeft();
+
+	CDialogTray::OnTimer(nIDEvent);
+}
+
+void CMiddleBroDlg::ShowTimeLeft()
+{
+	auto limitedTimeLeft = CTimeSpan(Settings::Inst.DailyTimeLimit) - limitedTime;
 	if (limitedTimeLeft < 0)
 	{
 		limitedTimeLeft = 0;
@@ -144,11 +177,11 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	ctrlClock.SetOutputTime(limitedTimeLeft, workTimeLeft, displayTime);
-	
+
 	if (limitedTimeLeft == Settings::Inst.SecondsBeforeFirstSignal)
 	{
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
-			GetModuleHandle(NULL), 
+			GetModuleHandle(NULL),
 			SND_RESOURCE | SND_ASYNC);
 
 		ShowBaloon(_T("Middle Bro"), _T("Session will be blocked soon.\r\nTime left: " + limitedTimeLeft.Format("%H:%M:%S")));
@@ -175,6 +208,7 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 
 	if (workTimeLeft == 0 && !BlockingDlg::IsVisible())
 	{
+		theApp.WriteProfileInt(_T("Runtime"), _T("LimitedTime"), (int)(limitedTime.GetTotalSeconds()));
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_END),
 			GetModuleHandle(NULL),
 			SND_RESOURCE | SND_ASYNC);
@@ -183,14 +217,12 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 		Watcher::Inst.SaveStatistics();
 		BlockingDlg::Show(BC_BREAK, MAKEINTRESOURCE(IDS_STRING_MAKE_A_BREAK));
 	}
-
-
-	CDialogTray::OnTimer(nIDEvent);
 }
-
 
 void CMiddleBroDlg::OnDummyExit()
 {
+	theApp.WriteProfileInt(_T("Runtime"), _T("LimitedTime"), (int)(limitedTime.GetTotalSeconds()));
+
 	//TODO: change to real password from settings
 	if (PwdDlg::ShowCheckPwd(EXIT_PWD))
 	{

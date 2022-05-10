@@ -39,6 +39,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	void ShowTimeLeft();
 	
 	CTime startTime;
 	
@@ -55,12 +56,10 @@ protected:
 	StatisticsDlg statDlg;
 	SettingsDlg settingsDlg;
 
-public:
 	ClockCtrl ctrlClock;
 	afx_msg void OnDummySettings();
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
-protected:
 	afx_msg LRESULT OnBlockingRemoved(WPARAM wParam, LPARAM lParam);
-public:
 	afx_msg void OnDummyStatistics();
+	int timeSaveThreshold=30;
 };
