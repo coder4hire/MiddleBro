@@ -15,6 +15,7 @@
 #define IDR_WAVE_WARNING                142
 #define IDS_STRING_TURN_OFF_WARNING     143
 #define IDS_STRING_MAKE_A_BREAK         144
+#define IDR_WAVE_COOCOO                 145
 #define IDC_EDIT1                       1000
 #define IDC_OUT                         1000
 #define IDC_EDIT_PWD                    1000
@@ -52,7 +53,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        144
+#define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32780
 #define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           107

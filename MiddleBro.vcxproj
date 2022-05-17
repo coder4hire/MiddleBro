@@ -224,7 +224,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\MiddleBro.rc2" />
-    <None Include="res\sound1.bin" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\MiddleBro.ico" />
@@ -232,6 +231,7 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="res\10min.wav" />
+    <Media Include="res\coocoo.wav" />
     <Media Include="res\end.wav" />
     <Media Include="res\warning.wav" />
   </ItemGroup>

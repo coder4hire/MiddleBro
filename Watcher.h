@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <functional>
 
 class ProgramInfo
 {
@@ -38,11 +39,22 @@ using ProgramsInfoTree = std::map<CString, std::map<CString, ProgramInfo>>;
 class Watcher
 {
 public:
+	enum EVENT_TYPE
+	{
+		LIMITED_CLEARED,
+		LIMITED_DETECTED,
+		BLACKLISTED_IS_ON_SCREEN,
+	};
+
+	using Callback = std::function<void(EVENT_TYPE)>;
+
 	static Watcher Inst;
 	~Watcher();
 	const std::vector<std::pair<CString,CString>>& GetWindowsNames() { return windowsNames; }
 	const ProgramsInfoTree& GetProgramsInfoMap() { return programsInfoMap; }
 	bool SaveStatistics();
+	void SetCallback(const Callback& callback) { this->callback = callback; }
+	bool IsLimitedOnScreen() { return isLimitedOnScreen; }
 protected:
 	Watcher();
 	ProgramsInfoTree programsInfoMap;
@@ -51,10 +63,12 @@ protected:
 	static std::map<UINT_PTR, Watcher*> timerToWatcherMap;
 	void RefreshWindowsNames();
 	void RefreshProgramsInfo();
-	bool CheckBlackNames();
+	bool CheckNames(const std::vector<CString>& names);
 	CString GetProcessName(HWND hWnd);
 	void CheckAndSaveStatistics(const CString& processName);
 	UINT_PTR timerID = 0;
 	CTime watchStartTime;
+	bool isLimitedOnScreen = false;
+	Callback callback;
 };
 

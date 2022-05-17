@@ -60,7 +60,7 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	Settings::Inst.ProcessProperties(NULL, false);
 	if (!Settings::Inst.LoadDataFromFiles(Settings::Inst.ConfigFilesLocation + _T("\\settings.json")))
 	{
-		AfxMessageBox(_T("Cannot load config files from:\r\n")+ Settings::Inst.ConfigFilesLocation + _T("\\settings.json"), MB_OK | MB_ICONEXCLAMATION);
+		AfxMessageBox(_T("Cannot load config files from:\r\n") + Settings::Inst.ConfigFilesLocation + _T("\\settings.json"), MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	startTime = CTime::GetCurrentTime();
@@ -89,6 +89,8 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	ShowTrayIcon();
 
 	RegisterPowerSettingNotification(GetSafeHwnd(), &GUID_MONITOR_POWER_ON, 0);
+
+	Watcher::Inst.SetCallback(std::bind(&CMiddleBroDlg::OnWatcherEvent, this, std::placeholders::_1));
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -135,7 +137,7 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 
 	if (lastTimeCheck.GetDay() != now.GetDay())
 	{
-		theApp.WriteProfileInt(_T("Runtime"), _T("DateSaved"), (int)(now.GetTime()/3600));
+		theApp.WriteProfileInt(_T("Runtime"), _T("DateSaved"), (int)(now.GetTime() / 3600));
 		limitedTime = 0;
 	}
 
@@ -143,7 +145,7 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 		displayTime += now - lastTimeCheck;
 
-		if (!BlockingDlg::IsVisible())
+		if (!BlockingDlg::IsVisible() && Watcher::Inst.IsLimitedOnScreen())
 		{
 			limitedTime += now - lastTimeCheck;
 		}
@@ -240,9 +242,28 @@ void CMiddleBroDlg::OnDummyShow()
 void CMiddleBroDlg::OnTimeExpired()
 {
 	Watcher::Inst.SaveStatistics();
-	BlockingDlg::Show(BC_NO_MORE_LIMITED_TIME,MAKEINTRESOURCE(IDS_STRING_TURN_OFF_WARNING));
+	BlockingDlg::Show(BC_NO_MORE_LIMITED_TIME, MAKEINTRESOURCE(IDS_STRING_TURN_OFF_WARNING));
 }
 
+void CMiddleBroDlg::OnWatcherEvent(Watcher::EVENT_TYPE type)
+{
+	switch (type)
+	{
+	case Watcher::BLACKLISTED_IS_ON_SCREEN:
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_WARNING),
+			GetModuleHandle(NULL),
+			SND_RESOURCE | SND_ASYNC);
+		break;
+	case Watcher::LIMITED_DETECTED:
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_COOCOO),
+			GetModuleHandle(NULL),
+			SND_RESOURCE | SND_ASYNC);
+		break;
+	case Watcher::LIMITED_CLEARED:
+		break;
+
+	}
+}
 
 void CMiddleBroDlg::OnDummySettings()
 {

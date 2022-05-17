@@ -102,9 +102,6 @@
     <None Include="res\MiddleBro.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\sound1.bin">
-      <Filter>Resource Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\MiddleBro.ico">
@@ -122,6 +119,9 @@
       <Filter>Resource Files</Filter>
     </Media>
     <Media Include="res\warning.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\coocoo.wav">
       <Filter>Resource Files</Filter>
     </Media>
   </ItemGroup>

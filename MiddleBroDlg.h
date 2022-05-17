@@ -13,6 +13,13 @@
 #include "StatisticsDlg.h"
 #include "SettingsDlg.h"
 
+enum OPERATION_MODE
+{
+	MODE_WHITELISTED,
+	MODE_LIMITED,
+	MODE_UNLIMITED
+};
+
 // CMiddleBroDlg dialog
 class CMiddleBroDlg : public CDialogTray
 {
@@ -53,6 +60,8 @@ protected:
 	afx_msg void OnDummyShow();
 
 	void OnTimeExpired();
+	void OnWatcherEvent(Watcher::EVENT_TYPE type);
+
 	StatisticsDlg statDlg;
 	SettingsDlg settingsDlg;
 
