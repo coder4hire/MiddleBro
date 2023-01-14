@@ -5,10 +5,7 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiddleBro", "MiddleBro.vcxproj", "{29B069F9-C07B-4B53-B485-9CCB4AE1EB01}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E86D7C78-4ADA-4CE9-9E49-913F0E7F5D67}"
-	ProjectSection(SolutionItems) = preProject
-		RSJparser.cpp = RSJparser.cpp
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiddleBroService", "MiddleBroService\MiddleBroService.vcxproj", "{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +23,14 @@ Global
 		{29B069F9-C07B-4B53-B485-9CCB4AE1EB01}.Release|x64.Build.0 = Release|x64
 		{29B069F9-C07B-4B53-B485-9CCB4AE1EB01}.Release|x86.ActiveCfg = Release|Win32
 		{29B069F9-C07B-4B53-B485-9CCB4AE1EB01}.Release|x86.Build.0 = Release|Win32
+		{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}.Debug|x64.ActiveCfg = Debug|x64
+		{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}.Debug|x64.Build.0 = Debug|x64
+		{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}.Debug|x86.ActiveCfg = Debug|Win32
+		{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}.Debug|x86.Build.0 = Debug|Win32
+		{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}.Release|x64.ActiveCfg = Release|x64
+		{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}.Release|x64.Build.0 = Release|x64
+		{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}.Release|x86.ActiveCfg = Release|Win32
+		{B5F68BC2-18C0-4663-9636-ACDE369FF3D3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

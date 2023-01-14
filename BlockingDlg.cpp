@@ -65,18 +65,36 @@ BOOL BlockingDlg::OnInitDialog()
 
 void BlockingDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	auto wnd = FindWindow(_T("Shell_TrayWnd"), NULL);
-	wnd->SendMessage(WM_COMMAND, 419, 0); // MIN_ALL
+	switch (nIDEvent)
+	{
+	case 0:
+	{
+		auto wnd = FindWindow(_T("Shell_TrayWnd"), NULL);
+		wnd->SendMessage(WM_COMMAND, 419, 0); // MIN_ALL
 
-	this->SetWindowPos(&wndTopMost, calculatedRect.left, calculatedRect.top,
-		calculatedRect.Width(), calculatedRect.Height(),
-		WS_EX_TOPMOST);
-	this->SetFocus();
+		this->SetWindowPos(&wndTopMost, calculatedRect.left, calculatedRect.top,
+			calculatedRect.Width(), calculatedRect.Height(),
+			WS_EX_TOPMOST);
+		this->SetFocus();
+		break;
+	}
+	case 1:
+	{
+		CTime currentTime = CTime::GetCurrentTime();
+		CTimeSpan elapsed = startTime + timeout - currentTime;
+		GetDlgItem(IDC_STATIC_TIMEOUT)->SetWindowText(elapsed.Format("%H:%M:%S"));
+		if (elapsed<0)
+		{
+			Close();
+		}
+		break;
+	}
+	}
 
 	CDialog::OnTimer(nIDEvent);
 }
 
-void BlockingDlg::Show(DWORD id, const CString& message)
+void BlockingDlg::Show(DWORD id, const CString& message, int timeout)
 {
 	if (!::IsWindow(dlg.GetSafeHwnd()))
 	{
@@ -93,7 +111,15 @@ void BlockingDlg::Show(DWORD id, const CString& message)
 	dlg.id = id;
 	dlg.GetDlgItem(IDC_STATIC_MESSAGE)->SetWindowText(message);
 	dlg.ShowWindow(SW_SHOW);
+	dlg.KillTimer(0);
 	dlg.SetTimer(0, MINIMIZING_TIMEOUT, NULL);
+	dlg.KillTimer(1);
+	if (timeout > 0)
+	{
+		dlg.SetTimer(1, 1000, NULL);
+	}
+	dlg.timeout = timeout;
+	dlg.startTime = CTime::GetCurrentTime();
 	
 	auto wnd = FindWindow(_T("Shell_TrayWnd"), NULL);
 	wnd->SendMessage(WM_COMMAND, 419, 0); // MIN_ALL
@@ -112,10 +138,7 @@ void BlockingDlg::OnBnClickedButtonContinue()
 	dlg.SetTimer(0, 2*MINIMIZING_TIMEOUT, NULL);
 	if (PwdDlg::ShowCheckPwd(MAIN_PWD))
 	{
-		KillTimer(0);
-		AfxGetMainWnd()->SendMessage(WM_BLOCKING_REMOVED,id);
-		id = 0xFFFFFFFF;
-		DestroyWindow();
+		Close();
 		return;
 	}
 	KillTimer(0);
@@ -130,6 +153,14 @@ void BlockingDlg::OnOK()
 
 void BlockingDlg::OnCancel()
 {
+}
+
+void BlockingDlg::Close()
+{
+	KillTimer(0);
+	AfxGetMainWnd()->SendMessage(WM_BLOCKING_REMOVED, id);
+	id = 0xFFFFFFFF;
+	DestroyWindow();
 }
 
 
@@ -147,5 +178,10 @@ void BlockingDlg::OnSize(UINT nType, int cx, int cy)
 		GetDlgItem(IDC_BUTTON_CONTINUE)->GetWindowRect(&rect);
 		GetDlgItem(IDC_BUTTON_CONTINUE)->SetWindowPos(NULL, (calculatedRect.Width() - rect.Width()) - 15, (calculatedRect.Height() - rect.Height()) - 15,
 			0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
+		GetDlgItem(IDC_STATIC_TIMEOUT)->GetWindowRect(&rect);
+		GetDlgItem(IDC_STATIC_TIMEOUT)->SetWindowPos(NULL, 15, (calculatedRect.Height() - rect.Height()) - 15,
+			0, 0, SWP_NOSIZE | SWP_NOZORDER);
+
 	}
 }

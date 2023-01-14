@@ -36,4 +36,5 @@ public:
 	CString valStatisticsLogsLocation;
 	unsigned int valDailyTimeLimit;
 	unsigned int valWorkTimeLimit;
+	unsigned int valBreakLength;
 };

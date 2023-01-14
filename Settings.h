@@ -19,6 +19,7 @@ public:
 	int SecondsBeforeFirstSignal = 300;
 	int DailyTimeLimit = 3600;
 	int WorkTimeLimit = 1860;
+	int BreakLength = 600;
 
 protected:
 	Settings() {}
@@ -31,6 +32,7 @@ public:
 		DEFINE_STRING(StatisticsLogsLocation);
 		DEFINE_INT(DailyTimeLimit);
 		DEFINE_INT(WorkTimeLimit);
+		DEFINE_INT(BreakLength);
 	}
 };
 

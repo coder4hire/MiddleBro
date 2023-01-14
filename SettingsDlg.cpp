@@ -20,6 +20,7 @@ SettingsDlg::SettingsDlg(CWnd* pParent /*=nullptr*/)
 	, valStatisticsLogsLocation(_T(""))
 	, valDailyTimeLimit(0)
 	, valWorkTimeLimit(0)
+	, valBreakLength(0)
 {
 
 }
@@ -39,6 +40,9 @@ void SettingsDlg::DoDataExchange(CDataExchange* pDX)
 	DDV_MinMaxUInt(pDX, valDailyTimeLimit, 5, 86400);
 	DDX_Text(pDX, IDC_WORK_TIME_LIMIT, valWorkTimeLimit);
 	DDV_MinMaxUInt(pDX, valWorkTimeLimit, 5, 86400);
+	DDX_Text(pDX, IDC_BREAK_LENGTH, valBreakLength);
+	DDV_MinMaxUInt(pDX, valBreakLength, 5, 86400);
+
 }
 
 
@@ -66,7 +70,6 @@ void SettingsDlg::OnOK()
 	if (UpdateData())
 	{
 		Settings::Inst.ProcessProperties(this, true);
-
 		CDialog::OnOK();
 	}
 }

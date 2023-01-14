@@ -82,7 +82,7 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	}
 
 	srand(nowDay);
-	SetTimer(0, 900, NULL);
+	SetTimer(0, 1000, NULL);
 	ShowTimeLeft();
 
 	Tooltip = "MiddleBro";
@@ -217,7 +217,7 @@ void CMiddleBroDlg::ShowTimeLeft()
 		ShowBaloon(_T("Middle Bro"), _T("Time to make a break."));
 		Sleep(2000);
 		Watcher::Inst.SaveStatistics();
-		BlockingDlg::Show(BC_BREAK, MAKEINTRESOURCE(IDS_STRING_MAKE_A_BREAK));
+		BlockingDlg::Show(BC_BREAK, MAKEINTRESOURCE(IDS_STRING_MAKE_A_BREAK), Settings::Inst.BreakLength);
 	}
 }
 
