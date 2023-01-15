@@ -21,30 +21,38 @@ Watcher::Watcher()
 			{
 				Inst.RefreshWindowsNames();
 				Inst.RefreshProgramsInfo();
-				if (Inst.CheckNames(Settings::Inst.BlackNames))
-				{
-					if (Inst.callback)
-					{
-						Inst.callback(BLACKLISTED_IS_ON_SCREEN);
-					}
-				}
 
-				bool isLimitedDetected = Inst.CheckNames(Settings::Inst.LimitedNames);
-				if (isLimitedDetected && !Inst.isLimitedOnScreen)
+				if (Settings::Inst.Mode != OM_UNLIMITED)
 				{
-					Inst.isLimitedOnScreen = true;
-					if (Inst.callback)
+					if (Inst.CheckNames(Settings::Inst.BlackNames))
 					{
-						Inst.callback(LIMITED_DETECTED);
+						if (Inst.callback)
+						{
+							Inst.callback(BLACKLISTED_IS_ON_SCREEN);
+						}
+					}
+
+					bool isLimitedDetected = Inst.CheckNames(Settings::Inst.LimitedNames);
+					if (isLimitedDetected && !Inst.isLimitedOnScreen)
+					{
+						Inst.isLimitedOnScreen = true;
+						if (Inst.callback)
+						{
+							Inst.callback(LIMITED_DETECTED);
+						}
+					}
+					else if (!isLimitedDetected && Inst.isLimitedOnScreen)
+					{
+						Inst.isLimitedOnScreen = false;
+						if (Inst.callback)
+						{
+							Inst.callback(LIMITED_CLEARED);
+						}
 					}
 				}
-				else if (!isLimitedDetected && Inst.isLimitedOnScreen)
+				else
 				{
 					Inst.isLimitedOnScreen = false;
-					if (Inst.callback)
-					{
-						Inst.callback(LIMITED_CLEARED);
-					}
 				}
 
 			}

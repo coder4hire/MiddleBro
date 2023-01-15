@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "DialogTray.h"
 #include "resource.h"
+#include "Settings.h"
 
 //IMPLEMENT_DYNCREATE(CDialogTray, CDialog)
 
@@ -136,6 +137,7 @@ afx_msg LRESULT CDialogTray::OnNotifyIcon(WPARAM wParam, LPARAM lParam)
 			menu.LoadMenu(IDR_TRAY_MENU);
 			POINT point;
 			GetCursorPos(&point);
+			SetMenuCheckmarks(menu);
 			menu.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN /*| TPM_RIGHTBUTTON | TPM_BOTTOMALIGN*/, point.x, point.y, this);
 			break;
 		}
@@ -154,4 +156,11 @@ void CDialogTray::OnOK()
 void CDialogTray::OnCancel()
 {
 	HideToTray();
+}
+
+void CDialogTray::SetMenuCheckmarks(CMenu& menu)
+{
+	menu.CheckMenuItem(ID_MODE_LIMITED, Settings::Inst.Mode == OM_LIMITED ? MF_CHECKED : MF_UNCHECKED);
+	menu.CheckMenuItem(ID_MODE_UNLIMITED, Settings::Inst.Mode == OM_UNLIMITED ? MF_CHECKED : MF_UNCHECKED);
+	menu.CheckMenuItem(ID_MODE_WHITELISTED, Settings::Inst.Mode == OM_WHITELISTED ? MF_CHECKED : MF_UNCHECKED);
 }

@@ -31,6 +31,7 @@ protected:
 	bool initializing;
 	virtual void OnOK();
 	virtual void OnCancel();
+	void SetMenuCheckmarks(CMenu& menu);
 };
 
 BOOL SetTooltip(LPCTSTR tooltip);

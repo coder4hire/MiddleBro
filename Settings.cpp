@@ -11,6 +11,8 @@
 
 Settings Settings::Inst;
 
+LPCTSTR Settings::OperationModeNames[] = { _T("Unlimited"),_T("Limited"),_T("Whitelisted") };
+
 bool Settings::LoadDataFromFiles(LPCTSTR fileName)
 {
 	FILE* fp = NULL;

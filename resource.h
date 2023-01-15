@@ -43,6 +43,7 @@
 #define IDC_STATIC_MESSAGE              1010
 #define IDC_BUTTON_CONTINUE             1011
 #define IDC_STATIC_TIMEOUT              1012
+#define IDC_STATIC_MODE                 1013
 #define ID_DUMMY_SETTINGS               32771
 #define ID_DUMMY_EXIT                   32772
 #define ID_DUMMY_SHOW                   32773
@@ -59,7 +60,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        148
 #define _APS_NEXT_COMMAND_VALUE         32780
-#define _APS_NEXT_CONTROL_VALUE         1013
+#define _APS_NEXT_CONTROL_VALUE         1014
 #define _APS_NEXT_SYMED_VALUE           107
 #endif
 #endif

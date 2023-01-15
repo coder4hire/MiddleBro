@@ -70,5 +70,10 @@ protected:
 	afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
 	afx_msg LRESULT OnBlockingRemoved(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDummyStatistics();
+	void RefreshMode();
 	int timeSaveThreshold=30;
+
+	afx_msg void OnModeLimited();
+	afx_msg void OnModeUnlimited();
+	afx_msg void OnModeWhitelisted();
 };

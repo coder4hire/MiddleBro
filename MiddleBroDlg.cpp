@@ -43,6 +43,9 @@ BEGIN_MESSAGE_MAP(CMiddleBroDlg, CDialogTray)
 	ON_WM_POWERBROADCAST()
 	ON_MESSAGE(WM_BLOCKING_REMOVED, &CMiddleBroDlg::OnBlockingRemoved)
 	ON_COMMAND(ID_DUMMY_STATISTICS, &CMiddleBroDlg::OnDummyStatistics)
+	ON_COMMAND(ID_MODE_LIMITED, &CMiddleBroDlg::OnModeLimited)
+	ON_COMMAND(ID_MODE_UNLIMITED, &CMiddleBroDlg::OnModeUnlimited)
+	ON_COMMAND(ID_MODE_WHITELISTED, &CMiddleBroDlg::OnModeWhitelisted)
 END_MESSAGE_MAP()
 
 
@@ -91,6 +94,7 @@ BOOL CMiddleBroDlg::OnInitDialog()
 	RegisterPowerSettingNotification(GetSafeHwnd(), &GUID_MONITOR_POWER_ON, 0);
 
 	Watcher::Inst.SetCallback(std::bind(&CMiddleBroDlg::OnWatcherEvent, this, std::placeholders::_1));
+	RefreshMode();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -139,23 +143,33 @@ void CMiddleBroDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 		theApp.WriteProfileInt(_T("Runtime"), _T("DateSaved"), (int)(now.GetTime() / 3600));
 		limitedTime = 0;
+		
+		Settings::Inst.Mode = OM_UNLIMITED;
+		RefreshMode();
 	}
 
 	if (isMonitorOn)
 	{
 		displayTime += now - lastTimeCheck;
-
-		if (!BlockingDlg::IsVisible() && Watcher::Inst.IsLimitedOnScreen())
-		{
-			limitedTime += now - lastTimeCheck;
-		}
-		workTime += now - lastTimeCheck;
 	}
 
-	if (!(limitedTime.GetTotalSeconds() % timeSaveThreshold))
+	if (Settings::Inst.Mode != OM_UNLIMITED)
 	{
-		timeSaveThreshold = (rand() * 600 / RAND_MAX + 30);
-		theApp.WriteProfileInt(_T("Runtime"), _T("LimitedTime"), (int)(limitedTime.GetTotalSeconds()));
+		if (isMonitorOn)
+		{
+			if (!BlockingDlg::IsVisible() && Watcher::Inst.IsLimitedOnScreen())
+			{
+				limitedTime += now - lastTimeCheck;
+			}
+
+			workTime += now - lastTimeCheck;
+		}
+
+		if (!(limitedTime.GetTotalSeconds() % timeSaveThreshold))
+		{
+			timeSaveThreshold = (rand() * 600 / RAND_MAX + 30);
+			theApp.WriteProfileInt(_T("Runtime"), _T("LimitedTime"), (int)(limitedTime.GetTotalSeconds()));
+		}
 	}
 
 	lastTimeCheck = now;
@@ -180,44 +194,47 @@ void CMiddleBroDlg::ShowTimeLeft()
 
 	ctrlClock.SetOutputTime(limitedTimeLeft, workTimeLeft, displayTime);
 
-	if (limitedTimeLeft == Settings::Inst.SecondsBeforeFirstSignal)
+	if (Settings::Inst.Mode != OM_UNLIMITED)
 	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
-			GetModuleHandle(NULL),
-			SND_RESOURCE | SND_ASYNC);
+		if (limitedTimeLeft == Settings::Inst.SecondsBeforeFirstSignal)
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
+				GetModuleHandle(NULL),
+				SND_RESOURCE | SND_ASYNC);
 
-		ShowBaloon(_T("Middle Bro"), _T("Session will be blocked soon.\r\nTime left: " + limitedTimeLeft.Format("%H:%M:%S")));
-	}
+			ShowBaloon(_T("Middle Bro"), _T("Session will be blocked soon.\r\nTime left: " + limitedTimeLeft.Format("%H:%M:%S")));
+		}
 
-	if (limitedTimeLeft == 0 && !BlockingDlg::IsVisible())
-	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_END),
-			GetModuleHandle(NULL),
-			SND_RESOURCE | SND_ASYNC);
-		ShowBaloon(_T("Middle Bro"), _T("Session time is over."));
-		Sleep(2000);
-		OnTimeExpired();
-	}
+		if (limitedTimeLeft == 0 && !BlockingDlg::IsVisible())
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE_END),
+				GetModuleHandle(NULL),
+				SND_RESOURCE | SND_ASYNC);
+			ShowBaloon(_T("Middle Bro"), _T("Session time is over."));
+			Sleep(2000);
+			OnTimeExpired();
+		}
 
-	if (workTimeLeft == Settings::Inst.SecondsBeforeFirstSignal)
-	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
-			GetModuleHandle(NULL),
-			SND_RESOURCE | SND_ASYNC);
+		if (workTimeLeft == Settings::Inst.SecondsBeforeFirstSignal)
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE_1RING),
+				GetModuleHandle(NULL),
+				SND_RESOURCE | SND_ASYNC);
 
-		ShowBaloon(_T("Middle Bro"), _T("You need to make break soon.\r\nTime left: " + workTimeLeft.Format("%H:%M:%S")));
-	}
+			ShowBaloon(_T("Middle Bro"), _T("You need to make break soon.\r\nTime left: " + workTimeLeft.Format("%H:%M:%S")));
+		}
 
-	if (workTimeLeft == 0 && !BlockingDlg::IsVisible())
-	{
-		theApp.WriteProfileInt(_T("Runtime"), _T("LimitedTime"), (int)(limitedTime.GetTotalSeconds()));
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_END),
-			GetModuleHandle(NULL),
-			SND_RESOURCE | SND_ASYNC);
-		ShowBaloon(_T("Middle Bro"), _T("Time to make a break."));
-		Sleep(2000);
-		Watcher::Inst.SaveStatistics();
-		BlockingDlg::Show(BC_BREAK, MAKEINTRESOURCE(IDS_STRING_MAKE_A_BREAK), Settings::Inst.BreakLength);
+		if (workTimeLeft == 0 && !BlockingDlg::IsVisible())
+		{
+			theApp.WriteProfileInt(_T("Runtime"), _T("LimitedTime"), (int)(limitedTime.GetTotalSeconds()));
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE_END),
+				GetModuleHandle(NULL),
+				SND_RESOURCE | SND_ASYNC);
+			ShowBaloon(_T("Middle Bro"), _T("Time to make a break."));
+			Sleep(2000);
+			Watcher::Inst.SaveStatistics();
+			BlockingDlg::Show(BC_BREAK, MAKEINTRESOURCE(IDS_STRING_MAKE_A_BREAK), Settings::Inst.BreakLength);
+		}
 	}
 }
 
@@ -318,5 +335,47 @@ void CMiddleBroDlg::OnDummyStatistics()
 	{
 		statDlg.ShowWindow(SW_SHOW);
 		statDlg.SetFocus();
+	}
+}
+
+
+void CMiddleBroDlg::OnModeLimited()
+{
+	if (PwdDlg::ShowCheckPwd(MAIN_PWD))
+	{
+		Settings::Inst.Mode = OM_LIMITED;
+		Settings::Inst.ProcessProperties(NULL, true);
+		RefreshMode();
+	}
+}
+
+
+void CMiddleBroDlg::OnModeUnlimited()
+{
+	if (PwdDlg::ShowCheckPwd(MAIN_PWD))
+	{
+		Settings::Inst.Mode = OM_UNLIMITED;
+		Settings::Inst.ProcessProperties(NULL, true);
+		RefreshMode();
+	}
+}
+
+
+void CMiddleBroDlg::OnModeWhitelisted()
+{
+	if (PwdDlg::ShowCheckPwd(MAIN_PWD))
+	{
+		Settings::Inst.Mode = OM_WHITELISTED;
+		Settings::Inst.ProcessProperties(NULL, true);
+		RefreshMode();
+	}
+}
+
+void CMiddleBroDlg::RefreshMode()
+{
+	auto pItem = GetDlgItem(IDC_STATIC_MODE);
+	if (pItem)
+	{
+		pItem->SetWindowText(Settings::OperationModeNames[(int)Settings::Inst.Mode]);
 	}
 }
